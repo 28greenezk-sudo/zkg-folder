@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111725">
+  <title>Starling - A tiny clicker</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #111725;
+      --panel: #1b2434;
+      --panel-soft: #222e40;
+      --paper: #f4efdf;
+      --muted: #a3adbb;
+      --mint: #94f0cf;
+      --coral: #ff8d78;
+      --sun: #ffd66e;
+      --line: rgba(244, 239, 223, .13);
+      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--paper);
+      background-color: var(--ink);
+      background-image:
+        radial-gradient(ellipse at 50% 5%, rgba(55, 89, 105, .32), transparent 43%),
+        radial-gradient(circle at 12% 76%, rgba(255, 141, 120, .08) 0 1px, transparent 2px),
+        radial-gradient(circle at 83% 28%, rgba(255, 214, 110, .1) 0 1px, transparent 2px);
+      background-size: auto, 47px 53px, 61px 67px;
+    }
+
+    button { font: inherit; }
+
+    .shell {
+      width: min(1040px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 30px 34px 26px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 23px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark { color: var(--sun); font-size: 23px; line-height: 1; }
+    .brand-name { font-size: 14px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .tagline { color: var(--muted); font-size: 12px; }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(265px, .8fr);
+      gap: 34px;
+      align-items: center;
+      padding: 34px 0;
+    }
+
+    .mine { text-align: center; }
+    .eyebrow { margin: 0 0 10px; color: var(--mint); font-size: 11px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(26px, 4vw, 38px); line-height: 1.12; font-weight: 700; }
+    .score { margin: 23px 0 0; font-size: clamp(43px, 7vw, 66px); line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .score-label { margin: 9px 0 0; color: var(--muted); font-size: 13px; }
+
+    .crystal-stage {
+      position: relative;
+      width: min(330px, 78vw);
+      aspect-ratio: 1;
+      margin: 18px auto 0;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .orbit {
+      position: absolute;
+      z-index: -1;
+      width: 89%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(148, 240, 207, .2);
+      border-radius: 50%;
+      box-shadow: 0 0 60px rgba(148, 240, 207, .08), inset 0 0 48px rgba(148, 240, 207, .04);
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    .orbit::before, .orbit::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: 0 0 15px var(--sun);
+    }
+
+    .orbit::before { top: 13%; left: 18%; }
+    .orbit::after { right: 9%; bottom: 25%; width: 5px; height: 5px; background: var(--coral); box-shadow: 0 0 13px var(--coral); }
+
+    .crystal-button {
+      width: 76%;
+      aspect-ratio: 1;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--paper);
+      background: transparent;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+
+    .crystal-button:hover { transform: scale(1.035); }
+    .crystal-button:active { transform: scale(.94); }
+    .crystal-button:focus-visible, .upgrade-button:focus-visible, .reset-button:focus-visible { outline: 3px solid var(--sun); outline-offset: 5px; }
+    .crystal-art { width: 84%; overflow: visible; filter: drop-shadow(0 0 26px rgba(148, 240, 207, .3)); animation: float 3.4s ease-in-out infinite; }
+    .tap-hint { margin: -2px 0 0; color: var(--muted); font-size: 12px; }
+
+    .shop {
+      padding: 23px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: linear-gradient(150deg, rgba(34, 46, 64, .94), rgba(27, 36, 52, .9));
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .18);
+      animation: arrive .65s .08s both;
+    }
+
+    .shop-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
+    .shop-heading h2 { margin: 0; font-size: 17px; }
+    .shop-heading span { color: var(--muted); font-size: 11px; }
+    .upgrade { padding: 19px 0 2px; }
+    .upgrade-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .upgrade-title { margin: 0; font-size: 14px; font-weight: 700; }
+    .upgrade-level { color: var(--mint); font-size: 11px; font-weight: 700; }
+    .upgrade-description { margin: 6px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .upgrade-button {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #16211f;
+      background: var(--mint);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      transition: background .15s ease, transform .15s ease, opacity .15s ease;
+    }
+
+    .upgrade-button:hover:not(:disabled) { transform: translateY(-1px); background: #b0f7dc; }
+    .upgrade-button:active:not(:disabled) { transform: translateY(1px); }
+    .upgrade-button:disabled { color: #a3adbb; background: #364252; cursor: not-allowed; }
+    .price { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .progress-wrap { margin-top: 22px; }
+    .progress-copy { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--muted); font-size: 10px; }
+    .progress-track { height: 5px; overflow: hidden; border-radius: 9px; background: rgba(244, 239, 223, .12); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--coral), var(--sun)); transition: width .25s ease; }
+    .shop-note { margin: 21px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .shop-note strong { color: var(--paper); font-weight: 700; }
+
+    footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .reset-button { padding: 5px 0 5px 8px; border: 0; color: var(--muted); background: transparent; cursor: pointer; font-size: 10px; }
+    .reset-button:hover { color: var(--coral); }
+    .float-number { position: absolute; z-index: 2; color: var(--sun); font-size: 20px; font-weight: 800; pointer-events: none; animation: pop .8s ease-out forwards; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @keyframes breathe { 50% { transform: scale(1.04); opacity: .7; } }
+    @keyframes float { 50% { transform: translateY(-7px) rotate(2deg); } }
+    @keyframes pop { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 18% { opacity: 1; } 100% { opacity: 0; transform: translateY(-58px) scale(1.1); } }
+    @keyframes arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 700px) {
+      .shell { padding: 22px 20px 16px; }
+      header { padding-bottom: 17px; }
+      .tagline { display: none; }
+      main { grid-template-columns: 1fr; gap: 23px; padding: 27px 0 24px; }
+      .score { margin-top: 18px; }
+      .crystal-stage { width: min(270px, 68vw); margin-top: 8px; }
+      .shop { width: min(430px, 100%); margin: 0 auto; padding: 20px; }
+      footer { font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span class="brand-name">Starling</span></div>
+      <div class="tagline">A little light, one tap at a time.</div>
+    </header>
+
+    <main>
+      <section class="mine" aria-labelledby="game-title">
+        <p class="eyebrow">A pocket-sized universe</p>
+        <h1 id="game-title">Wake the crystal</h1>
+        <p class="score" id="score" aria-live="polite">0</p>
+        <p class="score-label">stardust collected</p>
+        <div class="crystal-stage" id="crystal-stage">
+          <div class="orbit" aria-hidden="true"></div>
+          <button class="crystal-button" id="mine-button" type="button" aria-label="Collect stardust">
+            <svg class="crystal-art" viewBox="0 0 240 260" role="img" aria-label="Glowing mint crystal">
+              <defs>
+                <linearGradient id="crystal-front" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ffdc"/><stop offset=".48" stop-color="#79e6c1"/><stop offset="1" stop-color="#368e91"/></linearGradient>
+                <linearGradient id="crystal-side" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#75d8c0"/><stop offset="1" stop-color="#315e7c"/></linearGradient>
+                <linearGradient id="crystal-light" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5ffd5"/><stop offset="1" stop-color="#80f0c5"/></linearGradient>
+              </defs>
+              <path d="M120 15 192 67 217 155 120 244 23 155 48 67Z" fill="#3f8792" opacity=".35"/>
+              <path d="m120 15 47 60-47 169-47-169Z" fill="url(#crystal-front)"/>
+              <path d="m120 15 72 52-25 8Z" fill="#e0ffd5"/>
+              <path d="m167 75 50 80-97 89Z" fill="url(#crystal-side)"/>
+              <path d="m73 75-50 80 97 89Z" fill="#57b6b0"/>
+              <path d="m120 15 47 60h-94Z" fill="url(#crystal-light)"/>
+              <path d="m73 75 47 169V75Z" fill="#b1f5ce" opacity=".45"/>
+              <path d="m167 75-47 169V75Z" fill="#1d546f" opacity=".28"/>
+              <path d="m73 75 47-60 47 60" fill="none" stroke="#f3ffdb" stroke-opacity=".76" stroke-width="3"/>
+              <path d="m120 15v229" fill="none" stroke="#f3ffdb" stroke-opacity=".45" stroke-width="2"/>
+              <path d="m23 155 97 89 97-89" fill="none" stroke="#cfffe0" stroke-opacity=".38" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+        <p class="tap-hint">Tap the crystal to gather stardust</p>
+      </section>
+
+      <aside class="shop" aria-label="Upgrade shop">
+        <div class="shop-heading"><h2>Your little workshop</h2><span>UPGRADES</span></div>
+        <div class="upgrade">
+          <div class="upgrade-title-row"><p class="upgrade-title">Brighter fingertips</p><span class="upgrade-level" id="level">LEVEL 0</span></div>
+          <p class="upgrade-description">Each tap gathers one more piece of stardust.</p>
+          <button class="upgrade-button" id="upgrade-button" type="button" disabled>
+            <span id="upgrade-label">Gather 15 to upgrade</span><span class="price" id="upgrade-price">15 ✦</span>
+          </button>
+        </div>
+        <div class="progress-wrap" aria-label="Progress to next upgrade">
+          <div class="progress-copy"><span>Next upgrade</span><span id="progress-copy">0 / 15</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+        <p class="shop-note">Every glow starts somewhere. <strong>Keep tapping.</strong></p>
+      </aside>
+    </main>
+
+    <footer><span id="rate-label">1 stardust per tap</span><button class="reset-button" id="reset-button" type="button">Reset game</button></footer>
+    <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+  </div>
+
+  <script>
+    (() => {
+      const saveKey = "starling-clicker-save";
+      const scoreElement = document.getElementById("score");
+      const levelElement = document.getElementById("level");
+      const upgradeButton = document.getElementById("upgrade-button");
+      const upgradeLabel = document.getElementById("upgrade-label");
+      const upgradePrice = document.getElementById("upgrade-price");
+      const progressCopy = document.getElementById("progress-copy");
+      const progressFill = document.getElementById("progress-fill");
+      const rateLabel = document.getElementById("rate-label");
+      const status = document.getElementById("status");
+      const stage = document.getElementById("crystal-stage");
+
+      let game = { dust: 0, level: 0, cost: 15 };
+      try {
+        const saved = JSON.parse(localStorage.getItem(saveKey));
+        if (saved && Number.isFinite(saved.dust) && Number.isFinite(saved.level) && Number.isFinite(saved.cost)) {
+          game = { dust: Math.max(0, Math.floor(saved.dust)), level: Math.max(0, Math.floor(saved.level)), cost: Math.max(15, Math.floor(saved.cost)) };
+        }
+      } catch { /* Storage may be disabled; the game still works for this visit. */ }
+
+      function save() {
+        try { localStorage.setItem(saveKey, JSON.stringify(game)); } catch { /* Keep playing if storage is unavailable. */ }
+      }
+
+      function render() {
+        scoreElement.textContent = game.dust.toLocaleString();
+        levelElement.textContent = `LEVEL ${game.level}`;
+        upgradePrice.textContent = `${game.cost.toLocaleString()} ✦`;
+        upgradeButton.disabled = game.dust < game.cost;
+        upgradeLabel.textContent = game.dust >= game.cost ? "Upgrade your fingertips" : `Gather ${game.cost.toLocaleString()} to upgrade`;
+        progressCopy.textContent = `${Math.min(game.dust, game.cost).toLocaleString()} / ${game.cost.toLocaleString()}`;
+        progressFill.style.width = `${Math.min(100, game.dust / game.cost * 100)}%`;
+        rateLabel.textContent = `${(game.level + 1).toLocaleString()} stardust per tap`;
+      }
+
+      document.getElementById("mine-button").addEventListener("click", (event) => {
+        const amount = game.level + 1;
+        game.dust += amount;
+        save();
+        render();
+        status.textContent = `Collected ${amount} stardust.`;
+        const bounds = stage.getBoundingClientRect();
+        const sparkle = document.createElement("span");
+        sparkle.className = "float-number";
+        sparkle.textContent = `+${amount}`;
+        sparkle.style.left = `${bounds.width * (.38 + Math.random() * .24)}px`;
+        sparkle.style.top = `${bounds.height * (.3 + Math.random() * .18)}px`;
+        stage.append(sparkle);
+        sparkle.addEventListener("animationend", () => sparkle.remove(), { once: true });
+      });
+
+      upgradeButton.addEventListener("click", () => {
+        if (game.dust < game.cost) return;
+        game.dust -= game.cost;
+        game.level += 1;
+        game.cost = Math.ceil(game.cost * 1.65);
+        save();
+        render();
+        status.textContent = `Upgrade purchased. You now collect ${game.level + 1} stardust per tap.`;
+      });
+
+      document.getElementById("reset-button").addEventListener("click", () => {
+        if (!window.confirm("Reset your stardust and upgrades?")) return;
+        game = { dust: 0, level: 0, cost: 15 };
+        save();
+        render();
+        status.textContent = "Game reset.";
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
