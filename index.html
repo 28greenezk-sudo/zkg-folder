@@ -3,203 +3,152 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111725">
-  <title>Starling - A tiny clicker</title>
+  <meta name="theme-color" content="#f5f7f2">
+  <meta name="description" content="Live temperatures across more than 200 cities worldwide, with five-day forecasts for featured cities.">
+  <title>Weather, Everywhere — A world forecast</title>
   <style>
     :root {
-      color-scheme: dark;
-      --ink: #111725;
-      --panel: #1b2434;
-      --panel-soft: #222e40;
-      --paper: #f4efdf;
-      --muted: #a3adbb;
-      --mint: #94f0cf;
-      --coral: #ff8d78;
-      --sun: #ffd66e;
-      --line: rgba(244, 239, 223, .13);
-      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+      color-scheme: light;
+      --ink: #172b35;
+      --muted: #71818a;
+      --paper: #f5f7f2;
+      --white: #fff;
+      --line: #e8ece6;
+      --green: #397565;
+      --green-pale: #e7f1e9;
+      --blue: #b7ddeb;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      min-width: 320px;
-      min-height: 100vh;
-      margin: 0;
-      color: var(--paper);
-      background-color: var(--ink);
-      background-image:
-        radial-gradient(ellipse at 50% 5%, rgba(55, 89, 105, .32), transparent 43%),
-        radial-gradient(circle at 12% 76%, rgba(255, 141, 120, .08) 0 1px, transparent 2px),
-        radial-gradient(circle at 83% 28%, rgba(255, 214, 110, .1) 0 1px, transparent 2px);
-      background-size: auto, 47px 53px, 61px 67px;
-    }
-
-    button { font: inherit; }
-
-    .shell {
-      width: min(1040px, 100%);
-      min-height: 100vh;
-      margin: 0 auto;
-      padding: 30px 34px 26px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding-bottom: 23px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .brand { display: flex; align-items: center; gap: 11px; }
-    .brand-mark { color: var(--sun); font-size: 23px; line-height: 1; }
-    .brand-name { font-size: 14px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    .tagline { color: var(--muted); font-size: 12px; }
-
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(265px, .8fr);
-      gap: 34px;
-      align-items: center;
-      padding: 34px 0;
-    }
-
-    .mine { text-align: center; }
-    .eyebrow { margin: 0 0 10px; color: var(--mint); font-size: 11px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: clamp(26px, 4vw, 38px); line-height: 1.12; font-weight: 700; }
-    .score { margin: 23px 0 0; font-size: clamp(43px, 7vw, 66px); line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .score-label { margin: 9px 0 0; color: var(--muted); font-size: 13px; }
-
-    .crystal-stage {
-      position: relative;
-      width: min(330px, 78vw);
-      aspect-ratio: 1;
-      margin: 18px auto 0;
-      display: grid;
-      place-items: center;
-      isolation: isolate;
-    }
-
-    .orbit {
-      position: absolute;
-      z-index: -1;
-      width: 89%;
-      aspect-ratio: 1;
-      border: 1px solid rgba(148, 240, 207, .2);
-      border-radius: 50%;
-      box-shadow: 0 0 60px rgba(148, 240, 207, .08), inset 0 0 48px rgba(148, 240, 207, .04);
-      animation: breathe 4s ease-in-out infinite;
-    }
-
-    .orbit::before, .orbit::after {
-      content: "";
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--sun);
-      box-shadow: 0 0 15px var(--sun);
-    }
-
-    .orbit::before { top: 13%; left: 18%; }
-    .orbit::after { right: 9%; bottom: 25%; width: 5px; height: 5px; background: var(--coral); box-shadow: 0 0 13px var(--coral); }
-
-    .crystal-button {
-      width: 76%;
-      aspect-ratio: 1;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      color: var(--paper);
-      background: transparent;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease;
-    }
-
-    .crystal-button:hover { transform: scale(1.035); }
-    .crystal-button:active { transform: scale(.94); }
-    .crystal-button:focus-visible, .upgrade-button:focus-visible, .reset-button:focus-visible { outline: 3px solid var(--sun); outline-offset: 5px; }
-    .crystal-art { width: 84%; overflow: visible; filter: drop-shadow(0 0 26px rgba(148, 240, 207, .3)); animation: float 3.4s ease-in-out infinite; }
-    .tap-hint { margin: -2px 0 0; color: var(--muted); font-size: 12px; }
-
-    .shop {
-      padding: 23px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: linear-gradient(150deg, rgba(34, 46, 64, .94), rgba(27, 36, 52, .9));
-      box-shadow: 0 18px 60px rgba(0, 0, 0, .18);
-      animation: arrive .65s .08s both;
-    }
-
-    .shop-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
-    .shop-heading h2 { margin: 0; font-size: 17px; }
-    .shop-heading span { color: var(--muted); font-size: 11px; }
-    .upgrade { padding: 19px 0 2px; }
-    .upgrade-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .upgrade-title { margin: 0; font-size: 14px; font-weight: 700; }
-    .upgrade-level { color: var(--mint); font-size: 11px; font-weight: 700; }
-    .upgrade-description { margin: 6px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-
-    .upgrade-button {
-      width: 100%;
-      min-height: 48px;
-      padding: 0 14px;
-      border: 0;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      color: #16211f;
-      background: var(--mint);
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 800;
-      transition: background .15s ease, transform .15s ease, opacity .15s ease;
-    }
-
-    .upgrade-button:hover:not(:disabled) { transform: translateY(-1px); background: #b0f7dc; }
-    .upgrade-button:active:not(:disabled) { transform: translateY(1px); }
-    .upgrade-button:disabled { color: #a3adbb; background: #364252; cursor: not-allowed; }
-    .price { font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-    .progress-wrap { margin-top: 22px; }
-    .progress-copy { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--muted); font-size: 10px; }
-    .progress-track { height: 5px; overflow: hidden; border-radius: 9px; background: rgba(244, 239, 223, .12); }
-    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--coral), var(--sun)); transition: width .25s ease; }
-    .shop-note { margin: 21px 0 0; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.55; }
-    .shop-note strong { color: var(--paper); font-weight: 700; }
-
-    footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
-    .reset-button { padding: 5px 0 5px 8px; border: 0; color: var(--muted); background: transparent; cursor: pointer; font-size: 10px; }
-    .reset-button:hover { color: var(--coral); }
-    .float-number { position: absolute; z-index: 2; color: var(--sun); font-size: 20px; font-weight: 800; pointer-events: none; animation: pop .8s ease-out forwards; }
+    body { min-width: 320px; margin: 0; color: var(--ink); background: var(--paper); }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .shell { width: min(1480px, 100%); margin: 0 auto; padding: 0 36px 40px; }
+    .topbar { min-height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 14px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--green); font-size: 17px; }
+    .top-note { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #5eab76; box-shadow: 0 0 0 4px #e4f1e7; }
+    .intro { padding: 54px 0 29px; }
+    .eyebrow { margin: 0 0 13px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { max-width: 760px; margin: 0; font-size: clamp(38px, 6vw, 66px); font-weight: 650; letter-spacing: -.055em; line-height: 1.02; }
+    .intro-copy { margin: 16px 0 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .overview { min-height: 228px; position: relative; overflow: hidden; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; padding: 32px 42px; border-radius: 14px; color: #fff; background: #203c46; }
+    .overview-copy { position: relative; z-index: 1; }
+    .overview .eyebrow { margin-bottom: 11px; color: #b7d9c9; }
+    .overview h2 { max-width: 470px; margin: 0; font-size: clamp(24px, 3.6vw, 37px); line-height: 1.15; letter-spacing: -.035em; }
+    .overview-description { max-width: 470px; min-height: 24px; margin: 12px 0 0; color: #c7d5d7; font-size: 13px; line-height: 1.6; }
+    .overview-stats { display: flex; gap: 30px; margin-top: 21px; }
+    .overview-stat { display: grid; gap: 4px; }
+    .overview-stat strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+    .overview-stat span { color: #c0d0d1; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .sky-art { position: absolute; top: -60px; right: 3%; width: 42%; height: 350px; opacity: .95; pointer-events: none; }
+    .sun { position: absolute; top: 32px; right: 67px; width: 105px; aspect-ratio: 1; border-radius: 50%; background: #f5d994; box-shadow: 0 0 0 16px #f5d99418, 0 0 70px #f5d99445; }
+    .cloud { position: absolute; right: 12px; bottom: 36px; width: 230px; height: 72px; border-radius: 60px; background: #dce9e5; box-shadow: 0 15px 28px #0c242c35; }
+    .cloud::before, .cloud::after { content: ""; position: absolute; bottom: 25px; border-radius: 50%; background: inherit; }
+    .cloud::before { left: 42px; width: 100px; height: 100px; }
+    .cloud::after { left: 108px; width: 75px; height: 75px; }
+    .cloud-back { right: 155px; bottom: 9px; transform: scale(.7); opacity: .48; }
+    .map-panel { position: relative; overflow: hidden; border: 1px solid #dfe8df; border-radius: 13px; background: #eaf3f0; }
+    .map-controls { position: absolute; z-index: 1; top: 11px; right: 12px; display: flex; gap: 5px; }
+    .map-control { min-width: 34px; height: 32px; padding: 0 9px; border: 1px solid #d5e2d9; border-radius: 6px; color: #365d51; background: #fff; cursor: pointer; font-size: 17px; line-height: 1; }
+    .map-control:hover { background: #f2f7f3; }
+    .map-control:focus-visible { outline: 3px solid #86bba5; outline-offset: 2px; }
+    .map-reset { font-size: 11px; font-weight: 700; }
+    .map-viewport { overflow-x: auto; scrollbar-color: #b8cec2 #eaf3f0; scrollbar-width: thin; }
+    .world-map { display: block; width: 100%; min-width: 680px; height: auto; }
+    .map-ocean { fill: #eaf3f0; }
+    .map-graticule { fill: none; stroke: #d5e5df; stroke-width: 1; stroke-dasharray: 3 7; }
+    .map-land { fill: #cfdfd2; stroke: #bbd1c4; stroke-width: 1.5; stroke-linejoin: round; }
+    .map-marker { cursor: pointer; outline: none; }
+    .map-marker .marker-halo { fill: #397565; opacity: .13; transition: r .18s ease, opacity .18s ease; }
+    .map-marker .marker-core { fill: #397565; stroke: #fff; stroke-width: 3; transition: r .18s ease; }
+    .map-marker .marker-temp-bg { fill: #fff; stroke: #dce7df; stroke-width: 1; }
+    .map-marker .marker-temp { fill: #203b3e; font-size: 10px; font-weight: 750; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+    .map-marker:hover .marker-halo, .map-marker:focus .marker-halo, .map-marker[aria-pressed="true"] .marker-halo { r: 23px; opacity: .25; }
+    .map-marker:hover .marker-core, .map-marker:focus .marker-core, .map-marker[aria-pressed="true"] .marker-core { r: 8px; }
+    .map-marker:focus .marker-temp-bg { stroke: #397565; stroke-width: 2; }
+    .map-caption { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 17px; border-top: 1px solid #d8e5dd; color: #647b77; background: #f7faf6; font-size: 11px; }
+    .map-key { display: inline-flex; align-items: center; gap: 8px; }
+    .map-key-dot { width: 9px; height: 9px; border: 2px solid #fff; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 1px #85a897; }
+    .map-selection { color: #415d58; text-align: right; }
+    .map-selection strong { color: var(--ink); }
+    .map-marker:focus-visible { outline: none; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin: 43px 0 18px; }
+    .section-heading h2 { margin: 0; font-size: 22px; letter-spacing: -.025em; }
+    .section-heading p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .controls { display: flex; align-items: center; gap: 12px; }
+    .search-wrap { position: relative; }
+    .search-wrap span { position: absolute; top: 50%; left: 12px; color: #829098; font-size: 14px; transform: translateY(-50%); pointer-events: none; }
+    .search { width: 180px; height: 38px; padding: 0 12px 0 34px; border: 1px solid var(--line); border-radius: 8px; outline: none; color: var(--ink); background: #fff; font-size: 12px; }
+    .search:focus { border-color: #82aa9b; box-shadow: 0 0 0 3px #39756518; }
+    .units { height: 38px; display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .unit-button { min-width: 35px; border: 0; border-radius: 5px; color: var(--muted); background: transparent; cursor: pointer; font-size: 12px; font-weight: 700; }
+    .unit-button[aria-pressed="true"] { color: var(--green); background: var(--green-pale); }
+    .unit-button:focus-visible, .retry:focus-visible, .search:focus-visible { outline: 3px solid #86bba5; outline-offset: 2px; }
+    .city-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .city-card { min-width: 0; padding: 18px 17px 15px; border: 1px solid var(--line); border-radius: 11px; background: var(--white); box-shadow: 0 3px 12px #192e3505; animation: appear .4s both; }
+    .city-head { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+    .city-name { margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.02em; }
+    .city-country { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .current-row { min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 5px; padding: 6px 0; }
+    .condition-icon { font-size: 37px; line-height: 1; }
+    .current-temp { margin: 0; font-size: 39px; font-weight: 600; letter-spacing: -.07em; font-variant-numeric: tabular-nums; }
+    .condition { min-height: 17px; margin: -2px 0 11px; color: var(--muted); font-size: 11px; }
+    .city-meta { display: flex; justify-content: space-between; gap: 5px; margin: 0 0 13px; color: #64747c; font-size: 10px; }
+    .day-list { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid #edf0eb; }
+    .day-row { display: grid; grid-template-columns: 1fr 20px auto; align-items: center; gap: 7px; font-size: 10px; }
+    .day-name { color: #65757c; }
+    .day-icon { text-align: center; font-size: 13px; }
+    .day-temps { color: #6d7b81; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .day-temps strong { margin-right: 4px; color: var(--ink); font-weight: 700; }
+    .loading, .empty-state { grid-column: 1 / -1; display: grid; min-height: 220px; place-items: center; border: 1px dashed #d6dfd7; border-radius: 12px; color: var(--muted); background: #ffffff80; text-align: center; }
+    .loading-inner { display: grid; justify-items: center; gap: 13px; font-size: 13px; }
+    .spinner { width: 25px; height: 25px; border: 2px solid #d7e5da; border-top-color: var(--green); border-radius: 50%; animation: spin .8s linear infinite; }
+    .error-state { color: #784b42; background: #fffaf7; }
+    .retry { margin-top: 11px; padding: 8px 13px; border: 1px solid #e3c8bd; border-radius: 6px; color: #704338; background: #fff; cursor: pointer; font-size: 12px; }
+    .footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 27px; padding-top: 16px; border-top: 1px solid var(--line); color: #829098; font-size: 10px; }
+    .footer a { color: #557b6b; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    @keyframes breathe { 50% { transform: scale(1.04); opacity: .7; } }
-    @keyframes float { 50% { transform: translateY(-7px) rotate(2deg); } }
-    @keyframes pop { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 18% { opacity: 1; } 100% { opacity: 0; transform: translateY(-58px) scale(1.1); } }
-    @keyframes arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 700px) {
-      .shell { padding: 22px 20px 16px; }
-      header { padding-bottom: 17px; }
-      .tagline { display: none; }
-      main { grid-template-columns: 1fr; gap: 23px; padding: 27px 0 24px; }
-      .score { margin-top: 18px; }
-      .crystal-stage { width: min(270px, 68vw); margin-top: 8px; }
-      .shop { width: min(430px, 100%); margin: 0 auto; padding: 20px; }
-      footer { font-size: 9px; }
+    @keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 900px) {
+      .city-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .overview { grid-template-columns: 1fr .65fr; }
+      .sky-art { right: -5%; transform: scale(.85); }
     }
-
+    @media (max-width: 620px) {
+      .shell { padding: 0 19px 25px; }
+      .topbar { min-height: 66px; }
+      .top-note { font-size: 10px; }
+      .intro { padding: 39px 0 22px; }
+      .intro-copy { max-width: 370px; font-size: 13px; }
+      .overview { min-height: 246px; grid-template-columns: 1fr; padding: 27px 25px; }
+      .overview-description { max-width: 340px; }
+      .overview-stats { gap: 23px; }
+      .sky-art { top: -97px; right: -91px; width: 255px; opacity: .42; transform: scale(.78); }
+      .map-caption { align-items: flex-start; flex-direction: column; gap: 6px; padding: 11px 13px; }
+      .map-selection { text-align: left; }
+      .section-heading { align-items: start; flex-direction: column; margin-top: 34px; }
+      .controls { width: 100%; }
+      .search-wrap { flex: 1; }
+      .search { width: 100%; }
+      .city-grid { gap: 10px; }
+      .city-card { padding: 14px 12px 12px; }
+      .current-temp { font-size: 34px; }
+      .condition-icon { font-size: 31px; }
+      .city-meta { font-size: 9px; }
+    }
+    @media (max-width: 390px) {
+      .shell { padding-right: 14px; padding-left: 14px; }
+      .city-grid { grid-template-columns: 1fr; }
+      .city-card { padding: 16px; }
+      .current-row { min-height: 75px; }
+      .day-list { grid-template-columns: repeat(2, 1fr); row-gap: 10px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
@@ -207,136 +156,284 @@
 </head>
 <body>
   <div class="shell">
-    <header>
-      <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span class="brand-name">Starling</span></div>
-      <div class="tagline">A little light, one tap at a time.</div>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">☼</span><span>Weather, everywhere</span></div>
+      <div class="top-note"><span class="live-dot" aria-hidden="true"></span><span id="updated-label">Connecting to live forecasts</span></div>
     </header>
 
     <main>
-      <section class="mine" aria-labelledby="game-title">
-        <p class="eyebrow">A pocket-sized universe</p>
-        <h1 id="game-title">Wake the crystal</h1>
-        <p class="score" id="score" aria-live="polite">0</p>
-        <p class="score-label">stardust collected</p>
-        <div class="crystal-stage" id="crystal-stage">
-          <div class="orbit" aria-hidden="true"></div>
-          <button class="crystal-button" id="mine-button" type="button" aria-label="Collect stardust">
-            <svg class="crystal-art" viewBox="0 0 240 260" role="img" aria-label="Glowing mint crystal">
-              <defs>
-                <linearGradient id="crystal-front" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ffdc"/><stop offset=".48" stop-color="#79e6c1"/><stop offset="1" stop-color="#368e91"/></linearGradient>
-                <linearGradient id="crystal-side" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#75d8c0"/><stop offset="1" stop-color="#315e7c"/></linearGradient>
-                <linearGradient id="crystal-light" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5ffd5"/><stop offset="1" stop-color="#80f0c5"/></linearGradient>
-              </defs>
-              <path d="M120 15 192 67 217 155 120 244 23 155 48 67Z" fill="#3f8792" opacity=".35"/>
-              <path d="m120 15 47 60-47 169-47-169Z" fill="url(#crystal-front)"/>
-              <path d="m120 15 72 52-25 8Z" fill="#e0ffd5"/>
-              <path d="m167 75 50 80-97 89Z" fill="url(#crystal-side)"/>
-              <path d="m73 75-50 80 97 89Z" fill="#57b6b0"/>
-              <path d="m120 15 47 60h-94Z" fill="url(#crystal-light)"/>
-              <path d="m73 75 47 169V75Z" fill="#b1f5ce" opacity=".45"/>
-              <path d="m167 75-47 169V75Z" fill="#1d546f" opacity=".28"/>
-              <path d="m73 75 47-60 47 60" fill="none" stroke="#f3ffdb" stroke-opacity=".76" stroke-width="3"/>
-              <path d="m120 15v229" fill="none" stroke="#f3ffdb" stroke-opacity=".45" stroke-width="2"/>
-              <path d="m23 155 97 89 97-89" fill="none" stroke="#cfffe0" stroke-opacity=".38" stroke-width="2"/>
-            </svg>
-          </button>
-        </div>
-        <p class="tap-hint">Tap the crystal to gather stardust</p>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A little perspective, everywhere</p>
+        <h1 id="page-title">One world.<br>A forecast for all of it.</h1>
+        <p class="intro-copy">Live temperatures from more than 200 cities around the world, with five-day forecasts for featured destinations.</p>
       </section>
 
-      <aside class="shop" aria-label="Upgrade shop">
-        <div class="shop-heading"><h2>Your little workshop</h2><span>UPGRADES</span></div>
-        <div class="upgrade">
-          <div class="upgrade-title-row"><p class="upgrade-title">Brighter fingertips</p><span class="upgrade-level" id="level">LEVEL 0</span></div>
-          <p class="upgrade-description">Each tap gathers one more piece of stardust.</p>
-          <button class="upgrade-button" id="upgrade-button" type="button" disabled>
-            <span id="upgrade-label">Gather 15 to upgrade</span><span class="price" id="upgrade-price">15 ✦</span>
-          </button>
+      <section class="overview" aria-labelledby="overview-title">
+        <div class="overview-copy">
+          <p class="eyebrow">The world, right now</p>
+          <h2 id="overview-title">A little sunshine, somewhere.</h2>
+          <p class="overview-description" id="overview-description">Checking the skies around the world…</p>
+          <div class="overview-stats">
+            <div class="overview-stat"><strong id="global-range">—</strong><span>Range across mapped cities</span></div>
+            <div class="overview-stat"><strong id="rain-count">—</strong><span>Mapped cities expecting rain</span></div>
+          </div>
         </div>
-        <div class="progress-wrap" aria-label="Progress to next upgrade">
-          <div class="progress-copy"><span>Next upgrade</span><span id="progress-copy">0 / 15</span></div>
-          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="sky-art" aria-hidden="true"><div class="sun"></div><div class="cloud cloud-back"></div><div class="cloud"></div></div>
+      </section>
+
+      <section aria-labelledby="map-title">
+        <div class="section-heading">
+          <div><h2 id="map-title">Live temperatures around the world</h2><p>Search for any mapped city, or zoom in to explore crowded regions.</p></div>
         </div>
-        <p class="shop-note">Every glow starts somewhere. <strong>Keep tapping.</strong></p>
-      </aside>
+        <div class="map-panel">
+          <div class="map-controls" role="group" aria-label="Map zoom controls">
+            <button class="map-control" id="map-zoom-in" type="button" aria-label="Zoom in">+</button>
+            <button class="map-control" id="map-zoom-out" type="button" aria-label="Zoom out">−</button>
+            <button class="map-control map-reset" id="map-zoom-reset" type="button">Reset</button>
+          </div>
+          <div class="map-viewport" tabindex="0" aria-label="Scrollable world map">
+            <svg class="world-map" id="world-map" viewBox="0 0 1000 500" role="group" aria-labelledby="map-svg-title map-svg-description">
+              <title id="map-svg-title">Live temperatures in more than 200 cities worldwide</title>
+              <desc id="map-svg-description">Select a city marker, then zoom in to explore nearby temperatures. The map shows country outlines in a Mercator projection.</desc>
+              <rect class="map-ocean" width="1000" height="500"></rect>
+              <g class="map-graticule" aria-hidden="true">
+                <path d="M0 125H1000M0 250H1000M0 375H1000M250 0V500M500 0V500M750 0V500"></path>
+                <ellipse cx="500" cy="250" rx="125" ry="250"></ellipse>
+                <ellipse cx="500" cy="250" rx="250" ry="250"></ellipse>
+              </g>
+              <path class="map-land" id="map-land-shapes" d="M994.8 274.7L996.0 275.6L992.7 275.7L994.8 274.7Z M594.2 251.3L608.9 256.5L608.9 261.8L612.0 264.4L609.8 265.2L596.0 266.1L593.7 263.1L585.4 261.6L582.3 259.1L581.5 256.3L585.4 254.7L584.5 251.6L594.2 251.3Z M475.9 210.0L475.9 212.8L466.8 212.7L466.8 216.6L464.2 216.7L464.1 219.7L452.6 220.2L459.0 219.4L468.4 211.2L475.9 210.0Z M158.8 171.7L146.0 167.8L144.9 164.4L137.5 159.9L138.9 155.9L123.7 145.8L118.2 148.2L108.3 144.3L108.4 113.1L120.8 116.3L141.4 112.8L144.1 109.9L150.7 114.0L154.4 111.3L154.8 114.3L162.6 112.7L179.9 116.2L183.6 118.2L179.7 120.0L184.7 120.8L194.6 119.7L197.6 121.9L200.6 120.1L197.7 118.5L199.5 117.2L205.1 116.6L218.2 121.0L226.5 120.5L226.2 118.1L228.7 117.5L233.0 118.8L233.0 122.2L238.2 115.6L232.0 111.5L232.2 106.9L235.5 103.7L242.0 106.4L245.8 111.1L243.3 113.1L248.5 113.9L248.5 117.9L252.2 114.9L255.5 117.3L254.7 120.1L257.4 122.6L262.3 116.7L262.4 112.4L270.5 113.3L274.2 115.2L272.3 119.2L273.9 122.9L261.8 124.8L257.4 130.9L248.0 134.6L238.2 142.7L237.0 148.1L241.1 148.5L243.6 153.0L271.5 157.8L271.9 162.2L278.0 166.9L281.7 163.9L278.3 159.0L287.4 154.4L281.9 148.5L285.2 145.6L283.0 138.5L294.9 138.1L306.7 142.2L307.5 148.1L312.1 150.0L320.6 144.3L329.5 153.3L328.3 154.8L340.7 159.0L345.1 162.3L345.3 164.8L333.2 169.0L315.6 169.1L302.5 176.2L319.3 171.2L321.7 172.3L319.1 173.7L320.9 177.4L329.1 178.1L331.9 175.8L333.9 178.0L318.4 182.7L316.3 182.5L316.2 180.9L321.0 179.3L313.5 179.6L311.7 175.7L307.7 174.9L301.4 179.8L292.0 179.9L271.0 186.2L269.1 185.7L271.8 182.6L270.7 179.2L254.5 173.2L245.4 173.5L236.6 170.9L158.8 171.7Z M278.4 99.7L275.5 95.4L288.2 99.6L278.4 99.7Z M240.0 88.8L231.1 89.0L236.5 85.1L240.0 88.8Z M231.2 65.4L234.6 67.9L229.7 71.7L226.0 64.7L231.2 65.4Z M255.1 91.8L243.3 89.5L239.2 81.2L230.2 78.7L245.5 78.5L252.3 85.3L274.6 84.7L278.2 89.1L255.1 91.8Z M190.9 69.7L194.8 70.8L184.6 72.5L190.9 69.7Z M191.8 65.2L195.4 66.6L187.4 68.0L191.8 65.2Z M345.6 166.7L342.2 170.0L351.5 171.2L350.6 172.7L352.5 172.4L353.8 174.8L352.6 176.6L349.5 176.3L349.3 174.3L346.1 176.1L343.7 174.6L335.4 174.6L340.7 168.0L345.6 166.7Z M267.0 129.8L277.5 134.2L269.1 133.0L262.4 136.3L257.7 134.8L261.4 127.7L267.0 129.8Z M281.2 101.8L283.8 99.9L308.9 109.7L314.0 115.1L308.9 116.9L328.2 123.8L322.4 130.1L314.7 125.4L311.1 125.9L310.7 127.8L320.4 135.2L319.4 137.5L308.9 134.1L316.2 139.7L308.7 138.5L292.1 131.2L281.8 131.5L283.6 129.1L294.6 128.6L298.2 122.3L296.4 119.4L280.7 111.2L253.7 110.2L251.4 108.7L254.3 106.8L250.3 106.8L249.4 102.3L254.4 96.1L261.6 94.8L259.5 98.0L261.7 100.9L271.3 95.1L276.1 100.1L275.7 103.1L281.2 101.8Z M237.5 93.2L248.6 94.6L235.0 103.1L233.3 96.6L237.5 93.2Z M158.7 82.4L169.2 73.9L177.2 73.1L174.7 80.0L158.7 82.4Z M131.4 160.4L134.0 160.3L133.2 162.9L135.6 164.7L130.4 161.9L131.4 160.4Z M207.0 61.5L219.9 65.2L223.1 71.3L207.8 68.1L210.5 66.1L207.0 61.5Z M156.9 172.7L151.0 172.1L143.4 167.9L150.7 168.9L156.9 172.7Z M162.4 91.6L179.1 96.5L158.1 108.2L150.2 103.9L155.7 95.4L153.0 92.4L162.4 91.6Z M200.5 84.0L206.4 86.0L188.3 91.7L183.7 90.1L189.5 87.8L173.0 87.4L179.4 80.3L197.0 86.1L193.1 80.6L195.6 78.4L200.5 84.0Z M204.1 98.4L207.2 100.3L209.8 107.8L219.2 113.6L214.6 113.9L215.5 116.8L185.2 117.6L174.1 112.1L187.7 110.4L172.5 109.7L171.0 108.1L177.5 106.4L168.3 105.3L180.0 97.2L182.9 98.2L181.5 100.4L194.7 98.9L199.5 104.9L200.9 103.1L198.9 98.3L204.1 98.4Z M221.0 100.1L217.9 97.0L229.5 95.0L227.6 98.8L231.8 100.8L231.3 104.9L226.8 106.6L215.3 101.0L221.0 100.1Z M203.9 95.8L209.7 96.7L207.3 99.9L203.9 95.8Z M226.4 78.9L228.5 81.6L227.3 88.6L215.3 85.6L215.1 81.1L226.4 78.9Z M233.3 51.2L243.3 45.4L261.6 61.3L252.7 68.8L242.0 68.4L239.0 65.5L241.3 60.9L231.4 54.9L233.3 51.2Z M245.6 39.3L279.7 26.1L328.2 31.8L312.1 43.1L318.1 43.1L302.3 57.7L286.4 61.4L290.2 62.3L288.3 63.6L290.6 67.1L278.4 75.8L283.6 78.5L276.2 82.1L251.4 80.3L256.2 76.0L254.8 71.4L264.0 73.8L255.7 68.2L263.6 61.2L258.5 54.1L272.6 52.3L256.7 51.9L245.6 39.3Z M291.1 121.7L285.5 121.2L289.2 118.6L291.1 121.7Z M232.6 113.9L234.3 115.4L232.6 116.8L222.8 114.3L227.2 111.3L232.6 113.9Z M322.2 175.8L327.7 177.0L325.3 177.9L321.8 177.1L322.2 175.8Z M158.8 171.7L236.6 170.9L245.4 173.5L254.5 173.2L270.7 179.2L270.3 186.2L292.0 179.9L301.4 179.8L307.7 174.9L311.7 175.7L314.0 180.2L305.2 182.4L303.3 185.0L305.7 186.3L295.2 187.6L300.2 187.6L294.6 187.9L291.9 191.2L290.2 190.2L291.5 192.2L289.1 194.2L287.9 190.8L288.0 192.7L286.1 192.4L289.6 197.1L274.1 204.0L277.6 211.2L276.7 213.8L273.0 212.8L267.5 206.4L263.6 206.9L260.0 205.6L251.1 206.0L251.6 207.6L237.0 207.1L230.2 209.7L229.1 212.8L224.9 212.0L219.6 207.3L211.3 207.5L204.1 203.4L191.6 204.1L181.3 201.9L174.6 202.2L170.8 199.7L164.9 198.7L154.4 188.7L155.8 178.8L153.6 173.4L158.0 173.7L159.5 175.7L158.8 171.7Z M68.3 221.5L70.0 222.4L67.5 223.2L66.5 222.1L68.3 221.5Z M37.6 144.1L40.1 145.4L34.8 144.6L37.6 144.1Z M74.4 150.7L77.4 151.7L70.8 153.2L74.4 150.7Z M108.4 113.1L108.3 144.3L118.2 148.2L123.7 145.8L138.9 155.9L137.4 158.6L127.6 150.3L120.5 150.0L111.5 146.5L91.3 142.7L88.3 143.3L88.8 145.3L78.6 147.5L81.6 141.6L72.2 147.0L74.2 148.3L71.6 150.2L59.9 155.7L41.8 159.2L59.2 153.1L63.8 148.2L50.1 148.8L48.6 145.2L40.7 143.8L38.6 140.9L39.6 139.2L42.9 136.0L53.4 134.1L51.3 132.1L53.4 130.8L41.8 131.9L33.0 127.9L43.1 124.8L50.9 126.4L36.8 118.3L38.3 116.3L65.1 106.2L108.4 113.1Z M742.7 171.3L738.2 172.9L736.6 175.9L731.1 175.2L729.1 178.8L722.1 180.0L724.6 183.4L722.9 185.0L706.1 183.2L704.1 184.7L697.7 184.3L690.6 188.1L685.3 187.2L683.6 183.7L680.3 182.3L672.3 182.8L662.5 178.7L655.4 179.9L655.5 186.9L650.2 185.0L645.8 186.0L645.8 184.1L639.7 180.6L647.3 179.4L647.3 176.2L636.4 177.1L629.1 173.0L632.1 168.6L634.9 169.8L641.0 165.8L654.8 168.2L670.4 167.8L671.1 166.8L666.6 165.2L671.4 162.9L669.4 161.3L670.7 160.5L691.9 157.2L696.8 157.7L697.7 160.2L704.2 160.5L704.0 161.7L713.6 159.4L722.3 167.7L731.6 167.2L742.7 171.3Z M655.5 186.9L655.4 179.9L662.5 178.7L672.3 182.8L680.3 182.3L683.6 183.7L685.3 187.2L689.6 188.1L697.1 185.1L695.6 186.5L702.9 187.7L699.4 189.0L696.1 188.9L696.3 187.5L692.6 188.0L690.4 190.1L688.1 190.0L690.0 192.6L688.4 194.4L662.9 184.2L658.6 186.9L655.5 186.9Z M891.7 253.6L901.6 255.4L910.1 258.5L908.9 260.3L918.6 264.8L910.9 264.1L902.1 260.6L896.2 263.0L891.8 262.7L891.7 253.6Z M924.0 255.1L924.5 256.6L918.5 253.8L924.0 255.1Z M920.3 258.1L915.9 258.8L912.0 258.0L917.1 257.0L918.9 257.6L922.6 255.8L920.3 258.1Z M891.7 253.6L891.8 262.7L889.3 261.6L882.3 261.7L885.2 260.2L883.1 257.5L871.3 254.9L869.4 255.7L866.6 253.9L871.4 253.1L867.3 253.1L862.6 251.3L872.2 251.1L873.4 253.8L876.3 254.7L881.8 252.4L891.7 253.6Z M847.1 262.4L845.7 264.2L842.9 264.3L847.1 262.4Z M827.5 244.2L825.9 245.5L830.5 248.7L827.3 248.9L822.6 255.6L806.2 254.1L802.6 249.4L804.6 247.2L807.0 248.9L816.1 248.3L818.4 248.0L821.8 244.0L827.5 244.2Z M859.4 253.9L863.4 255.4L855.3 254.7L859.4 253.9Z M852.4 255.3L850.0 254.4L852.8 254.3L852.4 255.3Z M855.4 247.0L857.5 248.4L855.8 251.3L853.9 248.6L855.4 247.0Z M841.5 248.8L847.9 248.0L843.6 249.7L833.8 249.7L833.4 250.7L835.9 252.0L842.6 250.9L837.5 252.6L842.1 257.4L839.5 257.3L840.9 256.2L837.5 256.4L836.0 253.7L834.2 254.1L834.5 257.7L832.8 257.9L829.9 253.9L832.8 249.8L835.8 248.2L841.5 248.8Z M834.2 264.3L830.5 263.3L833.1 263.1L835.5 263.9L834.2 264.3Z M837.1 261.9L841.4 261.3L841.0 262.1L833.1 262.3L837.1 261.9Z M828.5 261.7L830.9 262.1L824.3 262.6L828.5 261.7Z M801.4 258.9L812.8 259.7L821.4 261.7L818.2 262.2L792.7 259.5L794.6 258.2L801.4 258.9Z M789.9 251.5L794.7 254.3L793.9 258.1L790.9 258.2L785.0 255.9L764.7 242.4L770.8 242.7L779.6 247.1L784.7 248.1L788.4 249.9L787.3 251.0L789.9 251.5Z M309.3 336.3L311.8 339.1L319.3 341.1L309.4 341.5L309.3 336.3Z M339.9 294.1L337.5 301.0L341.0 302.4L342.3 305.2L335.5 308.4L326.8 308.6L327.4 311.9L325.7 312.6L319.1 312.7L319.5 314.5L323.7 315.4L318.9 317.2L317.9 320.2L313.1 321.2L312.3 322.7L317.7 324.6L307.9 332.0L310.7 335.6L300.2 334.9L296.1 329.0L299.1 326.7L302.2 319.7L299.6 314.9L303.3 308.1L302.4 304.8L306.1 300.6L304.1 295.9L306.5 291.3L310.3 288.8L310.0 285.1L313.0 284.4L315.9 281.1L321.2 282.5L322.3 281.3L325.4 281.4L331.0 284.2L339.5 286.1L337.2 289.2L345.3 289.6L349.6 286.7L351.0 288.9L339.9 294.1Z M309.3 336.3L309.4 341.5L314.0 341.6L310.7 343.3L302.8 342.0L292.6 336.7L302.5 339.6L304.8 337.0L309.3 336.3Z M306.7 274.8L309.9 277.5L311.6 282.6L313.9 282.8L310.0 285.1L310.3 288.8L306.5 291.3L304.1 295.9L306.1 300.6L302.4 304.8L303.3 308.1L299.6 314.9L302.2 319.7L299.1 326.7L296.1 329.0L300.2 334.9L309.5 335.5L303.2 336.9L301.6 339.1L291.8 335.4L290.0 327.6L294.1 324.0L289.9 323.4L293.5 318.4L296.6 319.1L298.0 315.1L296.1 314.6L295.3 317.0L293.5 316.7L296.6 309.4L295.6 305.7L301.6 297.6L305.3 280.4L304.5 275.9L306.7 274.8Z M581.5 256.3L585.4 261.6L579.8 261.9L578.8 266.5L582.3 267.0L582.5 268.6L575.5 266.2L561.5 265.5L560.4 260.2L555.8 259.7L552.8 261.1L548.5 261.2L545.4 258.2L533.8 258.1L537.8 256.3L540.5 256.9L544.5 254.9L549.0 250.6L551.5 244.2L554.1 243.0L562.2 244.4L571.3 242.7L576.0 242.7L579.0 244.0L582.5 243.6L586.6 246.9L583.0 249.2L581.5 256.3Z M615.5 252.3L613.8 246.1L617.0 244.1L624.9 243.0L635.9 236.8L636.0 234.0L642.0 233.2L635.0 242.6L615.5 252.3Z M608.9 256.5L594.2 251.3L597.3 247.4L594.5 244.1L598.1 242.3L605.9 245.0L616.3 244.6L613.8 246.1L615.5 252.3L608.9 256.5Z M568.2 238.5L565.2 237.5L565.4 235.9L560.9 232.4L564.0 227.9L566.4 228.0L566.2 221.6L569.4 221.6L569.4 218.7L602.4 218.7L604.1 223.7L606.7 224.6L602.4 226.1L600.8 231.0L595.2 235.2L594.4 237.9L591.0 232.9L587.1 236.3L583.3 235.6L580.5 236.9L574.3 236.8L569.6 235.7L566.4 238.0L568.2 238.5Z M566.2 222.3L566.4 228.0L564.0 227.9L560.9 232.4L563.5 234.4L549.9 239.0L542.4 239.7L538.8 236.7L543.0 236.1L540.5 231.3L537.6 229.8L542.4 226.6L544.2 221.1L541.3 217.4L544.1 216.5L566.2 222.3Z M300.8 222.1L300.8 224.5L293.2 224.1L299.1 223.6L296.7 221.8L300.8 222.1Z M300.8 224.5L301.1 221.8L310.2 223.7L300.8 224.5Z M996.5 107.3L1000.0 105.5L1000.0 108.5L996.5 107.3Z M636.4 177.1L629.7 180.6L635.0 186.0L632.8 187.2L626.3 184.7L611.0 182.9L601.9 179.4L606.2 177.4L604.6 176.6L608.7 175.8L606.3 174.7L610.4 174.0L611.3 170.4L598.2 168.3L593.8 164.4L588.3 164.9L587.0 162.7L590.8 162.1L585.4 158.6L585.8 156.8L578.3 155.3L575.8 152.0L576.2 148.7L580.9 145.1L578.0 143.8L587.5 136.9L583.4 134.8L584.6 132.7L582.1 130.3L583.9 127.4L580.7 123.5L583.3 120.8L579.0 118.3L579.4 115.6L589.3 112.3L614.1 121.6L614.2 124.0L606.6 126.8L592.2 124.6L596.7 127.1L597.1 132.0L602.8 133.8L601.5 130.9L603.3 129.6L610.0 131.7L612.3 130.9L610.5 128.5L616.9 125.1L622.1 126.5L623.7 124.1L620.7 117.5L628.5 118.7L630.1 120.8L626.6 123.3L628.7 124.5L649.2 116.4L651.3 116.6L648.6 118.9L663.3 116.3L666.5 118.6L669.7 116.1L666.8 113.8L668.2 112.5L690.3 119.3L692.2 117.3L685.9 114.1L685.3 107.6L694.3 98.5L702.2 102.4L699.6 106.0L702.2 110.3L701.6 115.8L704.6 118.1L698.0 125.7L701.2 126.2L708.5 120.5L706.9 118.4L708.2 115.9L704.4 113.4L706.7 109.3L703.1 105.8L708.0 102.8L707.4 99.5L710.2 102.0L709.1 106.3L712.1 107.1L710.8 103.9L715.5 102.2L726.4 104.5L723.6 95.6L741.2 94.2L738.9 91.5L742.1 88.0L779.9 80.6L789.9 72.7L797.9 80.3L808.5 78.9L817.0 84.0L803.9 92.9L842.2 98.9L842.4 95.2L852.7 96.0L857.2 98.6L858.5 101.5L856.8 103.5L864.7 108.6L867.4 104.1L888.5 105.6L886.5 101.5L890.2 99.5L915.3 102.5L924.9 108.4L941.7 108.3L943.6 113.0L947.1 114.2L966.2 113.6L971.0 117.0L974.5 115.8L972.2 113.3L973.5 111.5L1000.0 116.0L1000.0 130.2L992.8 131.4L998.3 136.5L997.9 138.6L982.4 140.5L973.1 145.5L969.2 143.6L954.3 145.6L950.0 150.0L953.3 151.6L952.9 155.3L949.2 157.5L950.3 158.5L945.5 159.7L944.5 162.4L940.4 163.0L935.5 167.4L931.8 157.2L933.1 153.8L954.6 142.0L956.9 137.8L944.8 143.7L942.5 140.1L935.3 141.1L928.4 145.9L930.7 147.5L920.2 148.5L920.4 146.6L916.1 146.2L895.0 147.8L875.4 158.8L883.8 161.1L888.6 160.1L892.6 162.7L889.1 172.9L874.6 183.0L870.9 184.1L867.4 183.2L863.3 185.2L864.0 179.9L869.7 179.6L875.1 172.8L863.9 174.2L859.4 170.8L854.6 170.1L849.9 163.4L843.3 161.8L833.8 163.4L835.4 165.2L827.4 170.6L817.7 169.0L807.4 171.4L801.3 171.1L796.9 169.0L788.0 169.4L774.6 165.1L770.2 170.2L756.2 167.8L742.7 171.3L731.6 167.2L722.3 167.7L713.6 159.4L704.0 161.7L704.2 160.5L697.7 160.2L696.8 157.7L691.9 157.2L670.7 160.5L669.4 161.3L671.4 162.9L666.6 165.2L671.1 166.8L670.4 167.8L654.8 168.2L641.0 165.8L634.9 169.8L632.1 168.6L629.1 173.0L636.4 177.1Z M760.5 47.5L766.5 45.5L778.3 57.9L777.6 64.6L771.5 65.5L753.3 53.4L760.5 47.5Z M785.7 61.7L792.7 65.8L776.2 71.3L781.3 62.0L785.7 61.7Z M885.6 82.3L903.0 85.6L900.8 89.6L886.0 90.7L880.5 87.2L885.6 82.3Z M911.7 86.8L918.7 88.2L905.9 87.7L911.7 86.8Z M888.5 97.0L894.6 94.6L898.9 97.7L888.5 97.0Z M624.6 51.3L643.1 50.3L632.2 56.0L624.6 51.3Z M563.1 159.8L554.6 159.5L559.1 157.7L563.1 159.8Z M648.6 95.1L655.3 90.6L654.5 88.2L669.9 81.6L691.3 79.9L662.4 92.3L653.9 101.7L654.5 105.4L659.8 108.9L643.3 105.7L645.7 99.8L651.2 95.7L648.6 95.1Z M897.0 161.2L901.8 171.8L897.7 171.1L896.0 174.1L898.6 177.6L896.5 176.4L894.7 177.9L893.6 162.2L896.1 161.1L895.0 160.0L897.0 161.2Z M14.1 122.6L15.7 125.6L15.1 123.1L22.6 123.6L28.1 126.8L20.7 128.7L19.6 132.5L4.6 128.8L3.6 126.4L0.3 127.2L1.6 128.8L0.0 130.2L0.0 116.0L14.1 122.6Z M3.6 108.2L0.0 108.5L0.0 105.5L6.7 106.6L3.6 108.2Z M592.9 177.9L601.5 178.9L594.1 181.1L590.2 179.2L592.9 177.9Z M330.0 334.5L337.4 332.8L339.6 333.8L335.0 335.3L330.0 334.5Z M542.1 58.7L547.2 55.7L559.8 64.1L552.9 66.9L547.6 78.3L544.2 78.6L529.0 58.9L542.1 58.7Z M586.4 113.7L579.4 115.6L580.6 112.8L577.0 111.2L568.7 117.2L559.0 114.4L555.2 118.1L550.0 117.5L537.7 130.8L537.7 133.2L534.9 133.1L533.1 136.1L534.2 144.9L530.6 148.3L528.8 146.7L523.3 149.8L515.7 149.0L513.9 139.6L553.3 112.6L578.2 106.9L586.9 110.0L583.3 111.1L586.4 113.7Z M576.1 55.7L564.0 60.8L548.2 53.5L576.1 55.7Z M568.7 71.7L557.6 72.9L559.5 71.2L557.8 69.0L563.6 67.6L568.7 71.7Z M370.1 31.8L392.7 21.1L424.7 21.5L442.1 30.7L411.4 36.3L438.7 40.9L435.6 46.3L456.2 39.2L466.1 45.1L444.3 54.7L450.7 55.1L445.3 65.5L445.4 73.1L448.7 77.2L439.8 79.4L444.9 82.5L445.6 87.3L442.6 87.8L446.2 92.3L434.5 97.3L438.1 102.5L431.1 101.9L438.5 105.7L439.6 109.2L434.6 110.0L429.0 105.9L430.0 108.8L426.8 111.0L437.9 111.4L389.4 128.6L385.6 135.0L381.1 137.4L382.2 139.8L379.5 144.9L365.9 142.8L356.6 134.5L350.1 122.6L358.7 112.2L348.1 113.5L349.0 108.5L357.2 109.6L344.9 104.9L348.0 100.7L337.3 85.8L309.7 82.7L301.7 77.1L314.5 74.8L296.4 70.4L317.5 60.8L318.5 58.0L311.0 55.2L327.1 44.8L326.0 40.6L360.0 33.8L376.3 41.6L370.1 31.8Z M691.5 327.5L696.0 328.8L691.0 329.9L691.5 327.5Z M847.1 262.4L853.7 261.7L847.5 263.1L847.1 262.4Z M545.4 291.4L546.7 290.7L551.3 292.2L555.3 291.3L555.3 285.5L558.0 288.7L560.0 288.5L564.8 286.3L571.3 286.6L581.8 281.5L586.6 281.7L588.7 284.9L588.4 287.2L586.2 287.0L585.2 288.6L586.9 289.4L591.2 288.6L589.5 291.7L578.4 298.2L571.6 300.2L562.7 300.0L555.8 301.6L551.0 300.5L550.6 296.4L545.4 291.4Z M580.5 292.0L575.0 293.5L578.1 294.6L580.5 292.0Z M580.5 292.0L578.1 294.6L575.0 293.5L580.5 292.0Z M174.6 202.2L181.3 201.9L191.6 204.1L204.1 203.4L211.3 207.5L217.6 206.6L224.9 212.0L230.2 212.8L228.1 218.0L233.6 223.4L237.7 224.4L246.1 223.3L249.2 220.2L258.2 219.3L256.0 224.2L247.2 224.8L246.0 225.7L248.7 227.4L245.1 227.4L243.8 229.6L239.2 227.6L231.8 228.0L212.5 224.2L207.0 221.7L205.5 217.5L188.3 208.0L185.7 204.4L180.7 204.0L196.1 216.6L194.8 217.4L188.4 214.5L188.1 212.6L180.4 209.9L182.9 208.6L174.6 202.2Z M339.9 294.1L350.6 297.0L352.2 298.1L350.5 300.9L343.8 301.7L337.7 300.1L339.9 294.1Z M351.7 299.9L350.6 297.0L339.9 294.1L351.0 288.9L351.0 287.6L348.3 287.0L349.2 284.4L346.1 284.3L345.0 281.9L339.1 281.5L340.3 275.7L338.2 272.9L332.9 272.9L331.9 269.3L318.3 266.2L318.5 263.6L310.4 265.4L304.0 265.4L304.2 263.2L299.5 264.0L296.6 263.2L294.5 260.5L297.5 257.3L305.9 256.0L307.2 251.6L305.5 249.2L307.7 248.6L306.1 247.6L312.4 247.2L313.7 248.4L317.9 248.9L324.0 246.9L321.5 246.5L320.0 244.4L324.7 244.8L331.3 242.8L333.4 243.0L333.4 246.2L336.0 248.2L344.5 247.5L344.5 246.5L352.9 247.0L357.5 244.2L361.2 247.6L360.0 250.1L364.9 250.3L365.0 251.7L367.2 250.8L375.3 252.2L376.2 253.7L388.9 254.0L401.1 257.2L403.5 260.2L402.4 262.5L392.6 268.3L390.9 275.2L386.3 281.2L383.4 282.8L367.6 285.7L364.2 291.6L351.7 299.9Z M306.9 265.3L318.5 263.6L318.3 266.2L331.9 269.3L332.9 272.9L338.2 272.9L340.3 275.7L339.3 278.3L335.8 277.4L328.4 277.8L325.9 281.7L322.3 281.3L321.2 282.5L315.9 281.1L311.6 282.6L309.9 277.5L306.7 274.8L309.3 267.6L306.9 265.3Z M305.9 256.0L297.5 257.3L294.5 260.5L296.6 263.2L299.5 264.0L304.2 263.2L304.0 265.4L306.9 265.3L309.3 267.6L308.4 273.2L304.5 275.9L288.9 270.6L278.4 260.0L274.3 258.5L273.9 256.6L276.9 254.7L276.5 256.2L281.6 256.3L283.8 254.2L290.2 252.2L291.4 250.1L297.0 253.2L305.4 253.8L303.6 255.2L305.9 256.0Z M314.2 248.3L312.4 247.2L306.1 247.6L307.7 248.6L305.5 249.2L307.2 251.6L305.9 256.0L303.6 255.2L305.4 253.8L297.0 253.2L291.4 250.1L284.9 249.5L280.6 247.7L285.8 244.6L283.7 239.9L284.8 238.1L289.8 236.8L291.9 234.5L301.7 232.7L296.4 237.2L300.1 240.3L312.9 241.5L311.6 246.1L314.2 248.3Z M285.1 237.9L283.7 239.9L280.2 237.5L275.3 239.9L269.9 238.7L269.6 236.8L273.8 237.7L280.5 236.7L285.1 237.9Z M270.7 236.7L269.5 238.5L262.1 236.1L261.3 234.8L267.6 234.7L270.7 236.7Z M267.6 234.7L261.9 234.5L256.5 231.9L264.1 229.2L269.0 228.9L267.6 234.7Z M269.0 228.9L264.1 229.2L257.5 231.8L251.8 229.8L255.8 227.7L263.9 227.5L269.0 228.9Z M251.8 229.8L256.3 230.7L255.8 231.6L249.7 230.7L251.8 229.8Z M243.8 229.6L245.1 227.4L248.7 227.4L246.0 225.7L247.2 224.8L252.4 224.9L252.1 227.6L254.9 227.9L251.8 229.8L249.7 230.7L243.8 229.6Z M252.4 224.9L255.3 224.1L253.0 227.6L252.4 224.9Z M331.3 242.8L324.7 244.8L320.0 244.4L321.5 246.5L324.0 246.9L315.8 249.0L311.6 246.1L312.9 241.5L300.1 240.3L296.4 237.2L297.5 235.4L301.9 233.5L299.8 236.2L302.0 237.3L301.7 234.7L305.7 233.0L310.6 235.3L319.7 235.9L328.1 235.0L325.7 235.4L334.0 238.3L329.4 241.7L331.3 242.8Z M342.9 247.4L337.4 248.2L334.3 247.5L333.4 243.0L329.4 241.7L334.0 238.3L341.3 241.7L338.8 244.4L342.9 247.4Z M348.5 246.8L342.9 247.4L340.0 245.4L338.8 244.4L341.3 241.7L350.1 242.0L348.5 246.8Z M356.5 244.2L352.9 247.0L348.5 246.8L350.1 242.0L356.5 244.2Z M517.2 170.7L522.5 171.7L516.8 176.4L520.7 182.4L505.1 185.0L494.7 182.9L496.7 177.9L487.5 173.9L487.2 172.4L495.5 172.5L494.6 170.1L497.3 171.0L507.0 167.1L517.2 170.7Z M524.3 184.4L526.1 183.7L525.6 186.8L524.3 184.4Z M290.6 250.2L290.2 252.2L283.8 254.2L281.6 256.3L276.5 256.2L278.4 253.7L275.1 253.1L275.2 251.5L277.5 248.9L281.0 248.1L290.6 250.2Z M315.9 223.8L317.8 224.2L313.4 224.7L315.9 223.8Z M284.5 223.9L288.3 224.7L282.4 224.2L284.5 223.9Z M271.5 216.9L282.4 217.9L293.9 221.2L284.0 221.9L285.9 221.0L281.3 219.3L272.8 217.7L264.0 218.8L271.5 216.9Z M586.6 281.7L577.8 280.6L570.2 275.0L575.1 275.3L584.1 271.8L591.2 273.5L590.7 278.8L586.6 281.7Z M581.8 281.5L571.3 286.6L564.8 286.3L560.0 288.5L558.0 288.7L555.3 285.5L555.3 281.1L558.0 281.1L558.1 275.8L570.2 275.0L577.8 280.6L581.8 281.5Z M555.3 285.5L555.3 291.3L551.3 292.2L546.7 290.7L545.4 291.4L542.3 289.1L539.6 281.5L532.6 274.4L569.7 274.8L558.1 275.8L558.0 281.1L555.3 281.1L555.3 285.5Z M453.6 230.9L451.0 229.3L455.2 226.8L459.5 226.6L466.2 229.5L468.0 232.6L453.7 232.7L453.2 231.6L461.5 231.1L453.6 230.9Z M468.0 232.6L466.2 229.5L467.6 228.4L484.6 228.2L482.1 214.2L486.3 214.2L508.7 222.1L508.8 223.0L511.9 222.9L510.1 228.1L497.0 229.0L488.9 231.1L485.0 235.5L477.7 235.7L474.6 232.8L471.8 233.4L468.0 232.6Z M452.6 220.2L464.1 219.7L464.2 216.7L466.8 216.6L466.8 212.7L475.9 212.8L475.9 210.4L486.3 214.2L482.1 214.2L484.6 228.2L467.6 228.4L466.2 229.5L459.5 226.6L454.3 227.3L454.8 221.5L452.6 220.2Z M507.5 241.3L505.2 241.5L504.6 237.3L502.1 235.4L507.9 232.9L510.5 235.0L507.6 238.1L507.5 241.3Z M541.3 217.4L544.2 221.1L542.4 226.6L537.6 229.8L540.5 231.3L539.4 232.5L536.3 230.9L525.0 232.0L515.1 230.6L511.4 231.0L510.0 233.7L502.8 232.0L501.0 229.0L510.1 228.1L511.9 222.9L533.3 216.4L539.3 217.9L541.3 217.4Z M507.5 241.3L512.1 230.7L525.0 232.0L536.3 230.9L540.5 233.1L532.6 240.3L525.6 241.0L523.6 243.4L516.4 244.1L512.0 241.3L507.5 241.3Z M540.3 232.0L543.0 236.1L538.8 236.7L542.9 239.3L540.2 243.4L544.3 247.6L526.8 246.8L523.6 243.7L524.3 242.4L528.1 240.2L532.6 240.3L540.3 232.0Z M502.5 234.6L505.2 241.5L502.9 241.8L499.9 235.0L502.5 234.6Z M500.1 234.6L502.9 241.8L492.1 243.1L491.8 234.7L500.1 234.6Z M477.7 235.7L482.8 235.3L492.1 236.5L492.1 243.1L478.6 243.9L479.0 242.1L476.1 241.0L477.7 235.7Z M461.9 232.4L471.8 233.4L474.6 232.8L477.7 235.7L477.0 239.3L474.4 239.8L472.9 238.1L470.8 238.4L469.1 236.0L463.2 237.6L458.0 234.6L461.9 232.4Z M453.7 232.7L461.9 232.4L461.8 233.5L458.0 234.6L453.7 232.7Z M476.6 239.3L478.6 243.9L468.2 240.6L471.6 238.3L474.4 239.8L476.6 239.3Z M463.2 237.6L469.1 236.0L471.6 238.3L468.2 240.6L463.2 237.6Z M485.0 235.5L488.1 231.5L497.0 229.0L501.0 229.0L502.8 232.0L506.0 232.3L502.5 234.6L491.8 234.7L492.1 236.5L485.0 235.5Z M576.0 242.7L567.8 242.9L562.2 244.4L554.1 243.0L551.3 245.1L547.6 244.8L544.5 246.8L540.2 242.4L542.4 239.7L549.9 239.0L563.5 234.4L565.2 237.5L576.0 242.7Z M551.3 245.1L549.0 250.6L544.5 254.9L540.5 256.9L535.1 256.2L533.1 257.0L530.8 255.5L532.9 254.8L531.9 253.8L534.9 252.7L538.9 253.4L540.1 251.9L538.5 249.9L539.7 248.3L536.9 248.2L536.3 246.9L544.3 247.6L547.6 244.8L551.3 245.1Z M531.3 246.9L536.0 246.8L536.9 248.2L539.7 248.3L538.5 249.9L540.1 251.9L538.9 253.4L534.9 252.7L531.9 253.8L532.9 254.8L530.8 255.5L524.4 251.5L526.4 248.6L531.3 248.5L531.3 246.9Z M526.8 246.8L531.3 246.9L531.3 248.5L526.4 248.6L526.8 246.8Z M585.4 261.6L592.3 263.5L590.8 269.2L592.3 269.6L583.8 270.8L584.1 271.8L575.1 275.3L564.5 274.7L560.8 272.6L560.9 268.1L566.7 268.1L566.4 265.3L575.5 266.2L582.5 268.6L582.3 267.0L578.8 266.5L579.0 262.8L580.6 261.7L585.4 261.6Z M591.0 262.9L595.2 264.2L596.0 269.0L599.1 270.5L597.3 273.7L595.7 270.5L590.8 269.2L593.0 264.7L591.0 262.9Z M596.0 266.1L604.1 266.2L612.0 264.4L613.3 270.6L609.6 273.6L596.6 278.0L598.5 284.5L591.7 286.4L591.2 288.6L589.1 288.6L586.6 281.7L590.7 278.8L591.2 273.5L584.3 272.3L583.8 270.8L592.3 269.6L595.7 270.5L597.3 273.7L599.1 270.5L596.0 269.0L596.0 266.1Z M589.1 288.6L586.9 289.4L585.2 288.6L586.2 287.0L589.1 288.6Z M536.1 256.6L533.8 258.1L533.1 257.0L536.1 256.6Z M534.2 258.5L545.4 258.2L548.5 261.2L552.8 261.1L555.8 259.7L560.4 260.2L561.5 265.5L566.7 265.7L566.7 268.1L560.9 268.1L560.8 272.6L564.5 274.7L532.6 274.4L538.2 265.8L534.2 258.5Z M584.6 253.4L585.4 254.7L581.5 256.3L580.6 253.9L584.6 253.4Z M599.2 201.9L597.2 203.3L597.0 207.1L595.2 204.3L597.5 201.3L599.5 200.9L599.2 201.9Z M599.5 200.9L597.6 201.2L601.2 198.7L599.5 200.9Z M637.6 267.5L639.9 272.1L638.0 272.1L630.8 285.8L626.1 286.8L622.3 285.9L620.4 282.5L623.5 277.5L622.1 274.6L623.5 272.8L628.6 272.2L636.7 266.8L637.6 267.5Z M526.3 205.8L520.9 199.6L523.4 194.7L526.4 194.0L528.3 195.1L530.6 194.5L528.2 199.2L531.9 201.2L526.3 205.8Z M475.9 210.4L475.9 208.1L496.4 202.6L494.0 197.8L496.6 196.8L504.1 195.3L523.4 194.7L520.9 199.6L525.2 202.9L527.2 207.2L525.9 212.4L528.6 215.1L533.3 216.4L515.8 222.2L508.8 223.0L508.7 222.1L475.9 210.4Z M598.7 202.4L607.8 200.8L608.9 202.8L602.8 203.8L605.6 205.5L600.2 207.6L597.0 207.1L598.7 202.4Z M643.3 215.3L650.0 215.5L656.3 213.0L652.8 217.9L644.4 217.2L643.3 215.3Z M641.1 214.5L642.5 212.4L643.4 213.8L641.1 214.5Z M633.3 206.3L634.5 208.6L629.4 207.7L633.3 206.3Z M608.9 202.8L607.8 200.8L613.9 199.0L614.7 195.7L618.8 193.9L624.4 194.3L628.0 196.9L626.2 199.8L631.5 202.3L634.9 206.4L624.2 207.6L608.9 202.8Z M653.4 217.6L656.7 214.2L666.1 218.2L660.6 221.3L660.3 223.2L647.5 226.5L644.4 223.1L652.8 221.6L654.6 218.7L653.4 217.6Z M785.0 232.9L786.1 230.0L794.6 230.5L795.8 229.5L798.9 231.0L798.6 232.7L793.9 233.8L795.1 234.7L787.5 235.1L785.0 232.9Z M792.3 230.0L786.1 230.0L785.0 232.9L778.0 231.2L775.6 237.1L783.7 241.3L781.0 242.1L772.6 238.4L776.6 233.4L772.8 228.7L774.7 227.2L770.5 223.9L772.9 222.1L778.1 221.0L781.3 222.4L780.7 225.3L786.7 224.1L790.9 225.4L793.3 228.1L792.3 230.0Z M798.3 230.1L792.3 230.0L793.3 228.1L788.8 224.2L780.7 225.3L781.3 222.4L778.1 221.0L782.8 219.9L782.4 218.2L786.7 220.5L790.1 220.5L791.2 221.8L788.6 222.7L798.1 227.6L798.3 230.1Z M778.1 221.0L772.9 222.1L770.5 223.9L774.7 227.2L772.8 228.7L776.6 233.4L773.8 236.1L773.6 231.6L769.9 226.1L764.9 227.9L761.6 227.4L762.0 224.3L756.4 219.4L764.2 211.7L769.8 210.9L770.4 209.1L774.1 210.2L771.1 215.8L774.1 215.6L776.5 217.2L775.7 218.5L781.0 218.9L778.1 221.0Z M789.8 235.4L795.1 234.7L793.9 233.8L798.6 232.7L798.8 228.6L788.6 222.7L791.2 221.8L790.1 220.5L786.7 220.5L783.8 218.0L792.6 216.6L800.1 219.3L793.5 223.0L802.4 228.5L803.3 233.7L792.1 238.0L789.8 235.4Z M863.3 185.2L863.3 185.2L863.3 185.2L863.3 185.2Z M862.9 184.9L860.3 187.7L854.3 189.7L856.1 192.2L846.4 192.7L848.3 190.4L845.2 189.4L847.4 188.3L852.4 186.0L856.1 186.6L855.7 185.6L861.1 183.8L862.9 184.9Z M850.5 193.3L856.5 191.8L859.6 195.0L858.6 197.9L851.3 199.1L850.3 195.1L852.4 194.8L850.5 193.3Z M743.8 171.1L756.2 167.8L770.2 170.2L774.6 165.1L788.0 169.4L796.9 169.0L801.3 171.1L807.4 171.4L817.7 169.0L824.1 169.8L821.5 174.4L828.0 173.7L832.7 175.8L815.2 180.2L810.8 179.7L809.3 180.9L810.6 182.3L806.7 184.0L791.6 186.4L780.1 184.4L767.6 184.2L764.7 181.3L752.6 179.3L752.7 176.1L743.8 171.1Z M770.4 209.1L769.8 210.9L764.2 211.7L757.4 218.6L756.0 216.2L754.7 217.2L753.2 216.4L756.6 214.2L749.8 213.7L746.0 211.9L745.0 212.9L747.0 213.8L744.7 214.9L746.4 215.3L746.9 219.1L741.6 219.4L740.3 221.4L728.3 226.7L723.1 227.6L721.8 235.5L715.4 238.9L704.3 227.5L701.8 219.6L695.8 220.3L689.4 216.1L697.3 215.1L693.1 211.1L696.2 209.5L699.4 209.6L709.1 202.6L704.9 199.2L713.5 198.6L716.2 197.2L719.2 199.2L718.7 203.8L725.3 206.0L722.5 208.2L731.4 210.5L744.6 211.9L746.5 209.3L746.8 210.9L749.3 211.5L755.6 211.3L754.7 209.8L767.0 207.2L767.4 208.8L770.4 209.1Z M757.4 218.6L756.6 220.6L753.9 217.5L751.4 217.5L750.8 218.9L747.3 218.6L744.7 214.9L747.0 213.8L745.0 212.9L746.0 211.9L749.8 213.7L756.6 214.2L753.2 216.4L754.7 217.2L756.0 216.2L757.4 218.6Z M754.7 209.8L755.6 211.3L746.8 210.9L750.0 209.0L754.7 209.8Z M744.8 209.7L744.6 211.9L742.3 212.0L722.5 208.2L726.5 205.6L738.4 209.1L744.8 209.7Z M716.2 197.2L713.5 198.6L704.9 199.2L709.1 202.6L699.4 209.6L696.2 209.5L693.1 211.1L697.3 215.1L689.4 216.1L684.4 213.5L670.8 214.0L671.9 212.2L675.9 211.4L669.1 206.6L673.7 207.4L684.3 206.5L685.9 204.2L692.5 203.2L699.6 195.5L708.8 194.4L711.6 196.5L716.2 197.2Z M684.8 194.0L692.2 194.4L696.7 192.0L699.6 195.1L703.5 193.8L708.8 194.4L698.0 196.2L698.9 197.8L696.9 199.8L694.3 199.7L695.3 200.8L692.5 203.2L685.9 204.2L684.3 206.5L673.7 207.4L669.1 206.6L671.6 205.1L668.2 201.4L670.0 196.9L675.0 197.4L679.9 194.4L684.8 194.0Z M688.4 194.4L690.0 192.6L688.1 190.0L696.3 187.5L697.3 188.8L693.0 190.1L704.7 190.3L708.3 193.9L699.6 195.1L696.7 192.0L692.2 194.4L688.4 194.4Z M697.1 185.1L704.1 184.7L706.1 183.2L722.9 185.0L704.7 190.3L693.0 190.1L693.2 189.1L702.9 187.7L695.6 186.5L697.1 185.1Z M645.8 186.0L650.2 185.0L654.0 187.0L658.6 186.9L662.9 184.2L684.9 192.9L684.8 194.0L682.6 193.5L672.9 197.6L670.0 196.9L669.8 195.5L659.3 192.8L649.8 194.3L649.7 191.2L646.4 189.2L647.0 187.7L652.0 187.6L649.2 185.4L646.7 187.2L645.8 186.0Z M634.9 206.4L631.5 202.3L626.2 199.8L628.0 196.9L622.8 192.9L622.5 190.3L628.2 191.6L633.5 190.0L636.7 193.6L641.2 194.8L649.5 194.7L657.3 192.7L669.8 195.5L668.2 201.4L671.6 205.1L669.1 206.6L675.9 211.4L671.9 212.2L670.8 214.0L659.4 213.0L658.3 211.1L648.6 211.3L643.1 209.7L639.2 206.1L634.9 206.4Z M599.2 201.9L601.7 199.4L599.7 197.4L602.1 194.9L617.6 194.2L614.7 195.7L613.9 199.0L602.3 202.5L599.2 201.9Z M629.2 191.5L621.3 188.8L621.1 187.3L626.6 187.8L629.2 191.5Z M530.6 148.3L535.1 141.5L533.1 136.1L534.9 133.1L537.7 133.2L546.6 119.6L557.3 115.5L565.4 119.9L566.4 126.7L561.6 127.7L559.4 132.0L549.6 137.2L547.6 141.4L552.2 145.0L546.7 148.7L544.1 155.4L536.0 157.3L530.6 148.3Z M578.3 155.3L585.8 156.8L585.4 158.6L590.8 162.1L587.0 162.7L588.3 164.9L584.9 166.7L565.4 166.1L565.2 160.7L570.9 159.9L573.6 156.6L578.3 155.3Z M588.3 164.9L593.8 164.4L598.2 168.3L611.3 170.4L610.4 174.0L597.1 177.3L597.3 178.4L588.0 176.5L579.7 179.3L580.2 177.0L583.4 177.0L579.6 173.6L569.1 174.4L561.3 172.9L566.5 168.7L565.4 166.1L584.9 166.7L588.3 164.9Z M565.2 160.7L566.1 163.6L564.4 164.1L566.7 168.0L563.3 171.7L544.9 168.7L539.1 162.9L539.2 161.1L549.0 158.5L565.2 160.7Z M547.2 173.6L544.5 176.5L540.6 177.0L526.3 175.7L535.9 174.9L537.8 172.0L545.8 172.2L547.2 173.6Z M561.3 172.9L563.1 174.1L558.4 177.2L551.3 178.4L545.0 176.2L547.2 173.6L561.3 172.9Z M573.9 173.3L579.6 173.6L583.4 177.0L580.2 177.0L578.4 178.9L578.1 176.2L573.9 173.3Z M578.4 178.9L582.2 179.3L579.3 182.4L563.7 182.1L556.2 177.6L564.3 173.6L573.9 173.3L578.1 176.2L578.4 178.9Z M573.6 156.6L570.9 159.9L565.2 160.7L558.5 155.6L569.1 154.8L573.6 156.6Z M575.8 152.0L578.3 155.3L573.6 156.6L569.1 154.8L558.5 155.6L562.6 151.2L564.8 153.2L569.9 150.7L575.8 152.0Z M577.7 146.6L575.8 152.0L567.5 151.1L564.8 147.4L577.7 146.6Z M539.2 161.1L541.7 167.2L534.0 169.0L537.8 172.0L535.9 174.9L520.7 174.6L522.5 171.7L518.5 171.3L516.8 169.3L516.6 165.5L519.0 164.6L519.7 161.3L522.6 161.7L524.4 160.5L523.7 158.2L527.6 158.2L530.4 160.5L534.8 159.4L539.2 161.1Z M562.9 181.4L579.3 182.4L577.8 185.6L563.8 186.8L562.9 181.4Z M563.8 186.8L573.9 186.4L572.4 187.8L565.9 188.0L567.8 189.1L562.9 188.8L566.8 193.5L564.2 193.0L564.3 195.6L562.5 195.6L556.0 190.0L558.4 187.8L563.8 186.8Z M624.4 194.3L602.1 194.9L600.4 196.6L600.4 195.2L596.4 195.0L582.5 196.1L576.8 195.2L572.7 190.3L581.2 187.1L593.1 185.6L606.5 187.6L618.4 186.4L624.4 189.8L622.5 190.3L624.4 194.3Z M572.5 185.9L577.8 185.6L580.5 186.9L573.2 189.0L572.5 185.9Z M558.4 187.8L556.0 190.0L553.9 188.8L554.8 184.3L558.4 187.8Z M546.0 176.9L553.9 179.4L543.8 180.2L551.3 184.7L544.5 182.8L541.4 179.7L537.9 179.6L546.0 176.9Z M526.7 174.8L528.8 176.9L520.2 178.3L516.7 177.3L518.7 174.8L526.7 174.8Z M517.1 167.8L515.8 170.6L507.0 167.1L513.8 166.3L517.1 167.8Z M519.2 161.8L517.1 167.8L509.2 166.6L513.1 162.7L519.2 161.8Z M474.9 185.8L477.0 185.1L482.3 186.8L479.2 190.0L480.5 192.7L478.2 194.9L475.3 194.8L475.4 192.4L473.5 191.6L474.9 185.8Z M479.3 194.4L479.2 190.0L482.3 186.8L477.0 185.1L474.9 185.8L473.9 183.7L477.8 182.3L508.3 184.7L505.8 187.0L502.3 187.4L499.2 190.5L500.3 191.6L494.0 195.2L485.1 196.4L479.3 194.4Z M482.8 160.9L481.1 164.6L472.3 165.6L474.5 163.2L473.1 160.8L479.0 157.8L479.0 160.4L482.8 160.9Z M960.5 280.0L964.2 281.6L959.7 280.9L955.6 278.5L960.5 280.0Z M943.4 261.2L944.2 261.9L939.5 260.3L943.4 261.2Z M936.5 259.8L937.6 260.2L934.8 259.2L936.5 259.8Z M991.3 310.8L988.9 313.1L985.1 313.1L986.7 311.5L982.8 309.8L985.3 306.0L979.5 301.2L984.2 302.4L988.8 306.4L995.9 306.6L991.3 310.8Z M971.3 317.3L980.0 311.6L984.0 313.2L979.8 317.0L980.8 317.9L976.3 318.7L973.9 321.9L970.4 323.4L963.0 322.6L964.0 320.4L971.3 317.3Z M910.2 312.2L911.9 312.3L910.9 316.7L905.7 317.3L902.1 312.0L910.2 312.2Z M850.4 297.3L843.5 300.1L833.0 300.2L827.8 302.1L819.5 300.6L821.7 297.3L814.8 287.6L816.1 288.3L815.1 286.8L817.3 287.9L815.0 284.9L815.9 282.0L824.2 279.4L835.7 277.9L841.7 273.1L844.1 274.1L843.1 273.4L849.1 270.0L853.0 269.4L860.1 271.0L862.8 267.6L868.3 267.0L866.2 265.8L867.7 265.6L875.8 267.1L879.1 266.6L880.4 267.3L876.4 271.1L889.5 275.0L892.4 273.1L895.9 264.9L899.8 270.4L901.6 269.9L903.8 271.1L906.6 276.8L913.5 278.9L915.8 281.8L918.7 281.9L924.6 286.3L926.6 290.7L924.7 296.4L916.7 306.1L906.4 309.0L902.9 307.0L898.9 308.6L890.7 307.2L887.7 303.9L883.7 303.0L883.9 300.9L880.1 302.4L882.8 298.4L877.7 301.8L873.0 298.0L864.8 296.1L850.4 297.3Z M727.2 239.5L726.8 241.0L723.2 241.7L721.4 238.6L722.6 236.3L727.2 239.5Z M804.1 224.3L801.7 222.6L807.7 221.5L804.1 224.3Z M722.9 185.0L724.6 183.4L722.1 180.0L729.1 178.8L731.1 175.2L736.6 175.9L738.2 172.9L743.8 171.1L752.7 176.1L752.6 179.3L764.7 181.3L767.6 184.2L780.1 184.4L791.6 186.4L803.5 184.6L810.6 182.3L809.3 180.9L810.8 179.7L815.2 180.2L826.2 176.5L832.4 176.5L828.0 173.7L820.8 173.5L824.1 169.8L831.4 169.3L835.4 165.2L833.8 163.4L839.6 161.9L849.9 163.4L854.6 170.1L859.4 170.8L863.9 174.2L875.1 172.8L869.7 179.6L864.0 179.9L862.9 184.9L861.1 183.8L855.7 185.6L856.1 186.6L852.4 186.0L845.2 189.4L836.3 191.3L839.4 188.5L837.9 187.6L826.5 191.6L832.5 194.3L835.6 193.1L839.9 193.8L840.3 194.7L831.0 198.2L838.6 203.5L836.8 205.2L839.1 206.6L838.0 209.1L829.6 214.8L821.9 217.5L807.7 219.6L806.8 221.1L805.2 221.2L805.2 219.6L797.3 218.9L796.5 217.5L792.6 216.6L782.4 218.2L782.8 219.9L775.7 218.5L776.5 217.2L774.1 215.6L771.1 215.8L774.1 210.2L772.0 208.9L767.4 208.8L767.0 207.2L757.0 209.6L750.0 209.0L746.7 210.6L746.5 209.3L738.4 209.1L718.7 203.8L719.2 199.2L711.6 196.5L704.7 190.3L722.9 185.0Z M838.3 215.0L835.4 218.7L833.6 216.3L837.5 213.7L838.3 215.0Z M529.0 176.1L538.4 176.9L538.7 178.7L534.2 179.1L535.0 181.6L550.8 189.6L546.9 188.5L547.4 191.3L543.6 193.0L544.7 191.2L542.8 189.2L531.1 184.9L528.3 182.0L524.7 181.1L520.7 182.4L519.0 177.9L529.0 176.1Z M541.0 192.6L543.1 192.5L541.9 195.3L534.5 193.5L541.0 192.6Z M524.2 187.6L527.2 188.4L526.9 190.8L524.5 191.3L522.7 187.6L524.2 187.6Z M527.6 158.2L523.7 158.2L522.5 154.3L529.4 151.3L528.5 153.5L530.3 154.6L527.6 158.2Z M534.4 155.4L533.6 158.6L530.7 157.3L534.4 155.4Z M482.8 160.9L479.0 160.4L479.0 157.8L484.3 159.2L482.8 160.9Z M491.4 161.9L486.0 156.2L484.5 157.4L482.9 153.7L486.1 148.9L491.7 148.9L488.7 151.8L494.6 151.4L491.3 155.8L494.2 155.9L501.3 163.0L504.7 163.5L504.0 166.7L484.0 169.2L490.5 166.4L485.4 165.2L488.3 164.5L487.3 161.7L491.4 161.9Z M459.7 125.2L459.1 127.4L462.2 129.7L448.2 134.9L436.8 133.5L439.5 132.1L433.5 130.5L438.3 128.9L432.4 128.1L438.5 125.4L442.8 127.7L459.7 125.2Z M628.9 185.9L632.8 187.2L635.0 186.0L640.0 188.8L637.7 189.0L635.8 192.3L633.5 190.0L629.2 191.5L626.7 189.5L624.9 187.0L629.2 187.3L628.9 185.9Z M611.0 182.9L626.3 184.7L629.5 187.1L615.4 186.5L615.1 184.4L611.0 182.9Z M835.6 232.2L834.2 231.1L837.6 231.7L836.8 232.9L835.6 232.2Z M840.5 236.1L844.7 234.3L841.7 237.4L840.5 236.1Z M851.0 238.3L851.5 240.0L850.5 241.3L849.5 239.8L848.2 240.6L848.3 242.2L845.1 241.4L843.4 239.1L838.7 240.0L843.0 237.9L848.5 237.5L848.4 236.4L851.0 238.3Z M829.2 237.0L825.5 238.3L832.0 234.1L832.5 235.3L829.2 237.0Z M839.8 224.2L838.1 229.9L844.3 230.7L844.7 232.4L841.5 231.0L835.1 230.6L836.1 229.6L833.1 228.3L835.3 223.8L839.8 224.2Z M839.0 234.0L838.6 233.4L842.0 233.8L838.9 235.4L839.0 234.0Z M848.6 233.0L849.4 234.6L847.3 234.2L846.7 235.9L845.2 232.4L848.6 233.0Z M778.0 241.0L786.0 242.3L789.5 248.2L781.6 246.2L778.0 241.0Z M827.5 244.2L821.8 244.0L818.4 248.0L807.0 248.9L805.1 248.1L804.6 247.2L808.8 247.4L809.4 246.3L813.9 245.7L817.2 243.7L820.4 244.0L824.2 240.4L831.1 242.5L827.5 244.2Z M820.7 242.4L818.5 244.4L817.2 243.7L820.7 242.4Z M538.4 176.9L546.0 176.9L542.6 179.0L538.1 178.9L538.4 176.9Z M579.4 115.6L579.0 118.3L583.3 120.8L580.7 123.5L583.9 127.4L582.1 130.3L584.6 132.7L583.4 134.8L587.5 136.9L586.5 138.4L578.0 143.8L563.5 145.6L559.2 143.2L559.8 135.9L570.6 129.8L565.5 125.4L565.4 119.9L557.3 115.5L568.7 117.2L577.0 111.2L580.6 112.8L579.4 115.6Z M562.7 171.5L560.8 173.1L549.6 174.3L546.9 172.8L551.5 170.7L562.7 171.5Z M541.7 167.2L552.4 170.7L539.8 172.6L534.8 170.5L534.0 169.0L541.7 167.2Z M601.2 229.8L602.4 226.1L606.7 224.6L609.1 227.6L619.7 232.2L617.6 232.4L611.2 229.6L601.2 229.8Z M894.1 190.8L889.6 197.8L881.2 198.7L877.2 200.6L875.2 198.7L863.9 199.9L866.7 201.2L864.8 203.9L861.7 204.0L862.4 202.5L859.5 200.9L868.4 197.3L876.9 197.2L879.8 194.1L881.6 194.9L887.3 192.5L889.7 187.1L892.7 186.8L894.1 190.8Z M901.7 181.9L903.7 181.1L904.3 183.2L897.7 185.6L893.4 184.3L891.9 186.4L888.8 186.4L888.4 184.6L892.7 183.0L894.4 178.8L901.7 181.9Z M867.7 200.6L872.0 199.1L874.4 200.1L869.5 201.9L867.7 200.6Z M338.4 278.6L339.1 281.5L345.0 281.9L346.1 284.3L349.2 284.4L347.8 288.4L345.3 289.6L337.2 289.2L339.5 286.1L325.9 281.7L328.4 277.8L335.8 277.4L338.4 278.6Z M644.4 223.1L647.5 226.5L644.9 228.1L620.8 232.3L618.3 228.6L620.5 225.2L630.6 226.1L636.4 223.7L644.4 223.1Z M597.1 207.3L604.2 206.3L605.6 205.5L602.8 203.8L608.9 202.8L624.2 207.6L631.8 207.9L639.3 211.5L644.4 217.2L653.4 217.6L654.6 218.7L652.8 221.6L636.4 223.7L630.6 226.1L620.5 225.2L618.8 227.0L608.7 219.7L606.9 216.1L596.2 209.4L597.1 207.3Z M590.9 197.8L594.5 198.1L591.6 198.8L590.9 197.8Z M494.0 197.8L496.4 202.6L475.9 208.1L475.6 210.8L468.4 211.2L459.0 219.4L452.7 219.5L459.9 212.2L473.4 206.4L472.7 204.4L476.0 201.0L480.8 199.5L483.5 196.8L494.0 197.8Z M602.4 218.7L569.4 218.7L569.9 203.8L580.3 204.9L586.0 203.8L588.8 204.8L595.2 204.3L597.0 207.1L594.9 209.7L589.8 206.7L599.1 215.8L598.7 217.0L602.4 218.7Z M569.4 218.7L569.4 221.6L566.2 222.3L544.1 216.5L539.3 217.9L528.6 215.1L525.9 212.4L527.6 204.1L531.9 201.2L542.3 202.6L543.6 204.1L553.0 205.9L557.9 201.9L569.2 203.2L569.4 218.7Z M632.7 238.8L624.9 243.0L609.9 245.2L600.4 243.8L591.5 239.2L601.2 229.8L604.4 230.1L605.3 229.0L615.6 231.1L617.6 232.4L616.0 234.6L618.8 234.7L621.3 237.2L632.7 238.8Z M617.6 232.4L620.3 232.7L618.8 234.7L616.0 234.6L617.6 232.4Z M636.0 234.0L635.9 236.8L632.7 238.8L621.3 237.2L618.2 235.2L619.8 234.0L622.5 235.4L636.0 234.0Z M594.2 251.3L582.2 251.9L586.8 244.7L594.5 244.1L595.8 245.1L597.3 247.4L594.2 251.3Z M584.5 251.6L585.4 253.2L580.6 253.9L581.4 252.3L584.5 251.6Z M551.6 184.4L544.3 179.4L553.8 180.1L554.0 182.6L551.6 184.4Z M562.2 185.0L563.8 186.8L557.2 187.3L557.7 185.5L562.2 185.0Z M552.3 178.1L556.2 177.6L563.1 180.7L562.6 184.7L559.9 185.1L557.8 183.2L556.3 184.1L553.4 182.7L552.3 178.1Z M555.8 184.5L553.8 185.8L551.3 184.7L553.4 182.7L555.8 184.5Z M557.2 185.9L555.8 184.5L557.3 183.3L560.5 184.3L557.2 185.9Z M328.7 235.0L330.8 234.8L330.7 235.9L327.9 235.9L328.7 235.0Z M585.6 245.1L582.5 243.6L577.7 243.9L566.4 238.0L571.6 235.5L574.3 236.8L580.5 236.9L583.3 235.6L587.1 236.3L590.0 234.5L589.1 233.2L592.2 233.0L594.4 237.9L591.5 239.2L598.1 242.3L592.8 244.7L585.6 245.1Z"></path>
+              <g id="map-markers"></g>
+            </svg>
+          </div>
+          <div class="map-caption">
+            <span class="map-key"><span class="map-key-dot" aria-hidden="true"></span><span id="map-city-count">Live temperatures · swipe the map on small screens</span></span>
+            <span class="map-selection" id="map-selection" aria-live="polite">Choose a city to explore its forecast.</span>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="cities-title">
+        <div class="section-heading">
+          <div><h2 id="cities-title">Featured five-day forecasts</h2><p>Detailed outlooks in each city's local time. Search any mapped city above.</p></div>
+          <div class="controls">
+            <label class="search-wrap"><span aria-hidden="true">⌕</span><span class="sr-only">Search mapped cities or countries</span><input class="search" id="city-search" type="search" placeholder="Find any city…" autocomplete="off"></label>
+            <div class="units" role="group" aria-label="Temperature units">
+              <button class="unit-button" type="button" data-unit="C" aria-pressed="true">°C</button>
+              <button class="unit-button" type="button" data-unit="F" aria-pressed="false">°F</button>
+            </div>
+          </div>
+        </div>
+        <div class="city-grid" id="city-grid" aria-live="polite" aria-busy="true">
+          <div class="loading"><div class="loading-inner"><span class="spinner" aria-hidden="true"></span><span>Gathering forecasts from around the world…</span></div></div>
+        </div>
+      </section>
     </main>
 
-    <footer><span id="rate-label">1 stardust per tap</span><button class="reset-button" id="reset-button" type="button">Reset game</button></footer>
+    <footer class="footer"><span>Weather: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · City data: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> (CC BY 4.0)</span><span>Forecasts are updated throughout the day.</span></footer>
     <p class="sr-only" id="status" role="status" aria-live="polite"></p>
   </div>
-
   <script>
     (() => {
-      const saveKey = "starling-clicker-save";
-      const scoreElement = document.getElementById("score");
-      const levelElement = document.getElementById("level");
-      const upgradeButton = document.getElementById("upgrade-button");
-      const upgradeLabel = document.getElementById("upgrade-label");
-      const upgradePrice = document.getElementById("upgrade-price");
-      const progressCopy = document.getElementById("progress-copy");
-      const progressFill = document.getElementById("progress-fill");
-      const rateLabel = document.getElementById("rate-label");
+      const cities = [
+        { name: "Amsterdam", country: "Netherlands", region: "Europe", latitude: 52.37, longitude: 4.90 },
+        { name: "Nairobi", country: "Kenya", region: "Africa", latitude: -1.29, longitude: 36.82 },
+        { name: "Singapore", country: "Singapore", region: "Asia", latitude: 1.29, longitude: 103.85 },
+        { name: "Tokyo", country: "Japan", region: "Asia", latitude: 35.68, longitude: 139.69 },
+        { name: "New York", country: "United States", region: "North America", latitude: 40.71, longitude: -74.01 },
+        { name: "São Paulo", country: "Brazil", region: "South America", latitude: -23.55, longitude: -46.63 },
+        { name: "Sydney", country: "Australia", region: "Oceania", latitude: -33.87, longitude: 151.21 },
+        { name: "Reykjavík", country: "Iceland", region: "Europe", latitude: 64.15, longitude: -21.94 }
+      ];
+      const mapCityData = [{"name":"Shanghai","countryCode":"CN","latitude":31.22222,"longitude":121.45806},{"name":"Chongqing","countryCode":"CN","latitude":29.56026,"longitude":106.55771},{"name":"Chengdu","countryCode":"CN","latitude":30.66667,"longitude":104.06667},{"name":"Beijing","countryCode":"CN","latitude":39.9075,"longitude":116.39723},{"name":"Guangzhou","countryCode":"CN","latitude":23.11667,"longitude":113.25},{"name":"Shenzhen","countryCode":"CN","latitude":22.54554,"longitude":114.0683},{"name":"Kinshasa","countryCode":"CD","latitude":-4.32758,"longitude":15.31357},{"name":"Istanbul","countryCode":"TR","latitude":41.01384,"longitude":28.94966},{"name":"Lagos","countryCode":"NG","latitude":6.45407,"longitude":3.39467},{"name":"Ho Chi Minh City","countryCode":"VN","latitude":10.82302,"longitude":106.62965},{"name":"Tianjin","countryCode":"CN","latitude":39.14222,"longitude":117.17667},{"name":"Wuhan","countryCode":"CN","latitude":30.58333,"longitude":114.26667},{"name":"Lahore","countryCode":"PK","latitude":31.558,"longitude":74.35071},{"name":"Xi\u2019an","countryCode":"CN","latitude":34.25833,"longitude":108.92861},{"name":"Mumbai","countryCode":"IN","latitude":19.07283,"longitude":72.88261},{"name":"Mexico City","countryCode":"MX","latitude":19.42847,"longitude":-99.12766},{"name":"Hangzhou","countryCode":"CN","latitude":30.29365,"longitude":120.16142},{"name":"Karachi","countryCode":"PK","latitude":24.8608,"longitude":67.0104},{"name":"Delhi","countryCode":"IN","latitude":28.65195,"longitude":77.23149},{"name":"Moscow","countryCode":"RU","latitude":55.75204,"longitude":37.61781},{"name":"Dhaka","countryCode":"BD","latitude":23.7104,"longitude":90.40744},{"name":"Seoul","countryCode":"KR","latitude":37.566,"longitude":126.9784},{"name":"Harbin","countryCode":"CN","latitude":45.75,"longitude":126.65},{"name":"Dongguan","countryCode":"CN","latitude":23.01797,"longitude":113.74866},{"name":"Cairo","countryCode":"EG","latitude":30.06263,"longitude":31.24967},{"name":"Hefei","countryCode":"CN","latitude":31.86389,"longitude":117.28083},{"name":"Johannesburg","countryCode":"ZA","latitude":-26.20227,"longitude":28.04363},{"name":"Weifang","countryCode":"CN","latitude":36.71,"longitude":119.10194},{"name":"Nanjing","countryCode":"CN","latitude":32.06167,"longitude":118.77778},{"name":"Shenyang","countryCode":"CN","latitude":41.79222,"longitude":123.43278},{"name":"Foshan","countryCode":"CN","latitude":23.02677,"longitude":113.13148},{"name":"London","countryCode":"GB","latitude":51.50853,"longitude":-0.12574},{"name":"Jakarta","countryCode":"ID","latitude":-6.21462,"longitude":106.84513},{"name":"Bengaluru","countryCode":"IN","latitude":12.97194,"longitude":77.59369},{"name":"Jinan","countryCode":"CN","latitude":36.66833,"longitude":116.99722},{"name":"Hanoi","countryCode":"VN","latitude":21.0245,"longitude":105.84117},{"name":"Taipei","countryCode":"TW","latitude":25.05306,"longitude":121.52639},{"name":"Lima","countryCode":"PE","latitude":-12.04318,"longitude":-77.02824},{"name":"Bogot\u00e1","countryCode":"CO","latitude":4.60971,"longitude":-74.08175},{"name":"Dalian","countryCode":"CN","latitude":38.91222,"longitude":121.60222},{"name":"Hong Kong","countryCode":"HK","latitude":22.27832,"longitude":114.17469},{"name":"Baghdad","countryCode":"IQ","latitude":33.34058,"longitude":44.40088},{"name":"Wuzhong","countryCode":"CN","latitude":37.9867,"longitude":106.201},{"name":"Qingdao","countryCode":"CN","latitude":36.06488,"longitude":120.38042},{"name":"Tehran","countryCode":"IR","latitude":35.69439,"longitude":51.42151},{"name":"Yantai","countryCode":"CN","latitude":37.47649,"longitude":121.44081},{"name":"Hyderabad","countryCode":"IN","latitude":17.38405,"longitude":78.45636},{"name":"Rio de Janeiro","countryCode":"BR","latitude":-22.90642,"longitude":-43.18223},{"name":"Suzhou","countryCode":"CN","latitude":31.30408,"longitude":120.59538},{"name":"Puxi","countryCode":"CN","latitude":31.24414,"longitude":121.46592},{"name":"Zhengzhou","countryCode":"CN","latitude":34.75778,"longitude":113.64861},{"name":"Ahmedabad","countryCode":"IN","latitude":23.02579,"longitude":72.58727},{"name":"Abidjan","countryCode":"CI","latitude":5.35444,"longitude":-4.00167},{"name":"Nanning","countryCode":"CN","latitude":22.81667,"longitude":108.31667},{"name":"Kunming","countryCode":"CN","latitude":25.03889,"longitude":102.71833},{"name":"Shijiazhuang","countryCode":"CN","latitude":38.04139,"longitude":114.47861},{"name":"Changchun","countryCode":"CN","latitude":43.88,"longitude":125.32278},{"name":"Pudong","countryCode":"CN","latitude":31.23995,"longitude":121.50094},{"name":"Melbourne","countryCode":"AU","latitude":-37.814,"longitude":144.96332},{"name":"Dar es Salaam","countryCode":"TZ","latitude":-6.82349,"longitude":39.26951},{"name":"Saint Petersburg","countryCode":"RU","latitude":59.93863,"longitude":30.31413},{"name":"Taiyuan","countryCode":"CN","latitude":37.86944,"longitude":112.56028},{"name":"Alexandria","countryCode":"EG","latitude":31.20176,"longitude":29.91582},{"name":"Bangkok","countryCode":"TH","latitude":13.75398,"longitude":100.50144},{"name":"Kano","countryCode":"NG","latitude":12.00012,"longitude":8.51672},{"name":"Santiago","countryCode":"CL","latitude":-33.45694,"longitude":-70.64827},{"name":"Cape Town","countryCode":"ZA","latitude":-33.92584,"longitude":18.42322},{"name":"Peshawar","countryCode":"PK","latitude":34.008,"longitude":71.57849},{"name":"Zibo","countryCode":"CN","latitude":36.79056,"longitude":118.06333},{"name":"Jeddah","countryCode":"SA","latitude":21.49012,"longitude":39.18624},{"name":"Chennai","countryCode":"IN","latitude":13.08784,"longitude":80.27847},{"name":"Kolkata","countryCode":"IN","latitude":22.56263,"longitude":88.36304},{"name":"Xiamen","countryCode":"CN","latitude":24.47979,"longitude":118.08187},{"name":"Surat","countryCode":"IN","latitude":21.19594,"longitude":72.83023},{"name":"Yangzhou","countryCode":"CN","latitude":32.39722,"longitude":119.43583},{"name":"Huai'an","countryCode":"CN","latitude":33.58861,"longitude":119.01917},{"name":"Guiyang","countryCode":"CN","latitude":26.58333,"longitude":106.71667},{"name":"Yangon","countryCode":"MM","latitude":16.80528,"longitude":96.15611},{"name":"Bao'an","countryCode":"CN","latitude":22.55213,"longitude":113.88288},{"name":"Kabul","countryCode":"AF","latitude":34.52813,"longitude":69.17233},{"name":"Wuxi","countryCode":"CN","latitude":31.56887,"longitude":120.28857},{"name":"Giza","countryCode":"EG","latitude":30.00944,"longitude":31.20861},{"name":"Lanzhou","countryCode":"CN","latitude":36.05701,"longitude":103.83987},{"name":"Bamako","countryCode":"ML","latitude":12.60915,"longitude":-7.97522},{"name":"Riyadh","countryCode":"SA","latitude":24.68773,"longitude":46.72185},{"name":"Fuzhou","countryCode":"CN","latitude":26.06139,"longitude":119.30611},{"name":"\u00dcr\u00fcmqi","countryCode":"CN","latitude":43.80096,"longitude":87.60046},{"name":"New Taipei City","countryCode":"TW","latitude":25.06199,"longitude":121.45703},{"name":"New Territories","countryCode":"HK","latitude":22.42441,"longitude":114.11095},{"name":"Chattogram","countryCode":"BD","latitude":22.3384,"longitude":91.83168},{"name":"Addis Ababa","countryCode":"ET","latitude":9.02497,"longitude":38.74689},{"name":"Zaozhuang","countryCode":"CN","latitude":34.86472,"longitude":117.55417},{"name":"Zhongshan","countryCode":"CN","latitude":22.52306,"longitude":113.37912},{"name":"Shantou","countryCode":"CN","latitude":23.35489,"longitude":116.67876},{"name":"Los Angeles","countryCode":"US","latitude":34.05223,"longitude":-118.24368},{"name":"Faisalabad","countryCode":"PK","latitude":31.41554,"longitude":73.08969},{"name":"Dubai","countryCode":"AE","latitude":25.07725,"longitude":55.30927},{"name":"Ningbo","countryCode":"CN","latitude":29.87819,"longitude":121.54945},{"name":"Nanhai","countryCode":"CN","latitude":23.02193,"longitude":113.14278},{"name":"Casablanca","countryCode":"MA","latitude":33.58831,"longitude":-7.61138},{"name":"Ibadan","countryCode":"NG","latitude":7.37756,"longitude":3.90591},{"name":"Puyang","countryCode":"CN","latitude":29.45679,"longitude":119.88872},{"name":"Ankara","countryCode":"TR","latitude":39.91987,"longitude":32.85427},{"name":"Shiyan","countryCode":"CN","latitude":32.6475,"longitude":110.77806},{"name":"Hohhot","countryCode":"CN","latitude":40.81056,"longitude":111.65222},{"name":"Berlin","countryCode":"DE","latitude":52.52437,"longitude":13.41053},{"name":"Tangshan","countryCode":"CN","latitude":39.64381,"longitude":118.18319},{"name":"Rawalpindi","countryCode":"PK","latitude":33.59733,"longitude":73.0479},{"name":"L\u00fcliang","countryCode":"CN","latitude":37.5192,"longitude":111.14436},{"name":"Durban","countryCode":"ZA","latitude":-29.8579,"longitude":31.0292},{"name":"Anshan","countryCode":"CN","latitude":41.12361,"longitude":122.99},{"name":"Changzhou","countryCode":"CN","latitude":31.77359,"longitude":119.95401},{"name":"Busan","countryCode":"KR","latitude":35.10168,"longitude":129.03004},{"name":"Madrid","countryCode":"ES","latitude":40.4165,"longitude":-3.70256},{"name":"Pyongyang","countryCode":"KP","latitude":39.03385,"longitude":125.75432},{"name":"Pune","countryCode":"IN","latitude":18.51957,"longitude":73.85535},{"name":"Datong","countryCode":"CN","latitude":40.09361,"longitude":113.29139},{"name":"Bursa","countryCode":"TR","latitude":40.19559,"longitude":29.06013},{"name":"Changsha","countryCode":"CN","latitude":28.19874,"longitude":112.97087},{"name":"Quezon City","countryCode":"PH","latitude":14.6488,"longitude":121.0509},{"name":"Jaipur","countryCode":"IN","latitude":26.91962,"longitude":75.78781},{"name":"Huainan","countryCode":"CN","latitude":32.62639,"longitude":116.99694},{"name":"Surabaya","countryCode":"ID","latitude":-7.24917,"longitude":112.75083},{"name":"Incheon","countryCode":"KR","latitude":37.45646,"longitude":126.70515},{"name":"Haikou","countryCode":"CN","latitude":20.03421,"longitude":110.34651},{"name":"Caracas","countryCode":"VE","latitude":10.48801,"longitude":-66.87919},{"name":"Kyiv","countryCode":"UA","latitude":50.45466,"longitude":30.5238},{"name":"\u0130zmir","countryCode":"TR","latitude":38.41273,"longitude":27.13838},{"name":"Huizhou","countryCode":"CN","latitude":23.11147,"longitude":114.41523},{"name":"Buenos Aires","countryCode":"AR","latitude":-34.61315,"longitude":-58.37723},{"name":"Yinchuan","countryCode":"CN","latitude":38.46806,"longitude":106.27306},{"name":"Taichung","countryCode":"TW","latitude":24.1469,"longitude":120.6839},{"name":"Kanpur","countryCode":"IN","latitude":26.46523,"longitude":80.34975},{"name":"Toronto","countryCode":"CA","latitude":43.70643,"longitude":-79.39864},{"name":"Quito","countryCode":"EC","latitude":-0.22985,"longitude":-78.52495},{"name":"Brisbane","countryCode":"AU","latitude":-27.46794,"longitude":153.02809},{"name":"Luanda","countryCode":"AO","latitude":-8.83682,"longitude":13.23432},{"name":"Baotou","countryCode":"CN","latitude":40.6516,"longitude":109.84389},{"name":"Osaka","countryCode":"JP","latitude":34.69379,"longitude":135.50107},{"name":"Linyi","countryCode":"CN","latitude":35.06306,"longitude":118.34278},{"name":"Baoding","countryCode":"CN","latitude":38.87288,"longitude":115.46246},{"name":"Kaohsiung","countryCode":"TW","latitude":22.61626,"longitude":120.31333},{"name":"Guayaquil","countryCode":"EC","latitude":-2.19616,"longitude":-79.88621},{"name":"Belo Horizonte","countryCode":"BR","latitude":-19.92083,"longitude":-43.93778},{"name":"Minhang","countryCode":"CN","latitude":31.10881,"longitude":121.37471},{"name":"Bazhong","countryCode":"CN","latitude":31.8694,"longitude":106.74432},{"name":"Salvador","countryCode":"BR","latitude":-12.97563,"longitude":-38.49096},{"name":"Abuja","countryCode":"NG","latitude":9.05785,"longitude":7.49508},{"name":"Gazipur","countryCode":"BD","latitude":23.99844,"longitude":90.42234},{"name":"Chicago","countryCode":"US","latitude":41.85003,"longitude":-87.65005},{"name":"Wenzhou","countryCode":"CN","latitude":27.99942,"longitude":120.66682},{"name":"Bekasi","countryCode":"ID","latitude":-6.2349,"longitude":106.9896},{"name":"Dakar","countryCode":"SN","latitude":14.6937,"longitude":-17.44406},{"name":"Haiphong","countryCode":"VN","latitude":20.86481,"longitude":106.68345},{"name":"Yunfu","countryCode":"CN","latitude":22.92787,"longitude":112.03809},{"name":"Navi Mumbai","countryCode":"IN","latitude":19.03681,"longitude":73.01582},{"name":"Mogadishu","countryCode":"SO","latitude":2.03711,"longitude":45.34375},{"name":"Kumasi","countryCode":"GH","latitude":6.68848,"longitude":-1.62443},{"name":"Bandung","countryCode":"ID","latitude":-6.92222,"longitude":107.60694},{"name":"Gujranwala","countryCode":"PK","latitude":32.15567,"longitude":74.18705},{"name":"Medan","countryCode":"ID","latitude":3.58333,"longitude":98.66667},{"name":"Lucknow","countryCode":"IN","latitude":26.83928,"longitude":80.92313},{"name":"Xining","countryCode":"CN","latitude":36.62554,"longitude":101.75739},{"name":"Ouagadougou","countryCode":"BF","latitude":12.36566,"longitude":-1.53388},{"name":"Nagpur","countryCode":"IN","latitude":21.14631,"longitude":79.08491},{"name":"Fortaleza","countryCode":"BR","latitude":-3.71722,"longitude":-38.54306},{"name":"Cali","countryCode":"CO","latitude":3.43054,"longitude":-76.5199},{"name":"Perth","countryCode":"AU","latitude":-31.95224,"longitude":115.8614},{"name":"Daegu","countryCode":"KR","latitude":35.87028,"longitude":128.59111},{"name":"Algiers","countryCode":"DZ","latitude":36.73225,"longitude":3.08746},{"name":"Nanchang","countryCode":"CN","latitude":28.68396,"longitude":115.85306},{"name":"Baku","countryCode":"AZ","latitude":40.37767,"longitude":49.89201},{"name":"Nagoya","countryCode":"JP","latitude":35.18147,"longitude":136.90641},{"name":"Rome","countryCode":"IT","latitude":41.89193,"longitude":12.51133},{"name":"Houston","countryCode":"US","latitude":29.76328,"longitude":-95.36327},{"name":"Mashhad","countryCode":"IR","latitude":36.29807,"longitude":59.60567},{"name":"Shaoxing","countryCode":"CN","latitude":30.00237,"longitude":120.57864},{"name":"Nantong","countryCode":"CN","latitude":32.03028,"longitude":120.87472},{"name":"Baoshan","countryCode":"CN","latitude":31.40845,"longitude":121.48956},{"name":"Kowloon","countryCode":"HK","latitude":22.31667,"longitude":114.18333},{"name":"Gaziantep","countryCode":"TR","latitude":37.05944,"longitude":37.3825},{"name":"Lubumbashi","countryCode":"CD","latitude":-11.66089,"longitude":27.47938},{"name":"Manaus","countryCode":"BR","latitude":-3.10194,"longitude":-60.025},{"name":"Lusaka","countryCode":"ZM","latitude":-15.40669,"longitude":28.28713},{"name":"Bras\u00edlia","countryCode":"BR","latitude":-15.77972,"longitude":-47.92972},{"name":"Zhuhai","countryCode":"CN","latitude":22.27694,"longitude":113.56778},{"name":"Santo Domingo","countryCode":"DO","latitude":18.47186,"longitude":-69.89232},{"name":"Lom\u00e9","countryCode":"TG","latitude":6.12874,"longitude":1.22154},{"name":"Multan","countryCode":"PK","latitude":30.19679,"longitude":71.47824},{"name":"Havana","countryCode":"CU","latitude":23.13302,"longitude":-82.38304},{"name":"Depok","countryCode":"ID","latitude":-6.4,"longitude":106.81861},{"name":"Ordos","countryCode":"CN","latitude":39.6086,"longitude":109.78157},{"name":"Paris","countryCode":"FR","latitude":48.85341,"longitude":2.3488},{"name":"Coimbatore","countryCode":"IN","latitude":11.00555,"longitude":76.96612},{"name":"Qingyang","countryCode":"CN","latitude":35.70976,"longitude":107.64455},{"name":"Port Harcourt","countryCode":"NG","latitude":4.77742,"longitude":7.0134},{"name":"Pretoria","countryCode":"ZA","latitude":-25.74486,"longitude":28.18783},{"name":"C\u00f3rdoba","countryCode":"AR","latitude":-31.40648,"longitude":-64.18853},{"name":"Mbuji-Mayi","countryCode":"CD","latitude":-6.13603,"longitude":23.58979},{"name":"Aleppo","countryCode":"SY","latitude":36.20124,"longitude":37.16117}];
+      const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+      const mapCities = [
+        ...cities,
+        ...mapCityData.map((city) => ({
+          ...city,
+          country: regionNames.of(city.countryCode) || city.countryCode,
+          region: "World"
+        }))
+      ];
+      const featuredCityNames = new Set(cities.map((city) => city.name));
+      const conditions = {
+        0: ["Clear sky", "☀️"], 1: ["Mostly clear", "🌤️"], 2: ["Partly cloudy", "⛅"], 3: ["Overcast", "☁️"],
+        45: ["Foggy", "🌫️"], 48: ["Icy fog", "🌫️"], 51: ["Light drizzle", "🌦️"], 53: ["Drizzle", "🌦️"], 55: ["Heavy drizzle", "🌧️"],
+        56: ["Freezing drizzle", "🌧️"], 57: ["Freezing drizzle", "🌧️"], 61: ["Light rain", "🌧️"], 63: ["Rain", "🌧️"], 65: ["Heavy rain", "🌧️"],
+        66: ["Freezing rain", "🌧️"], 67: ["Freezing rain", "🌧️"], 71: ["Light snow", "🌨️"], 73: ["Snow", "🌨️"], 75: ["Heavy snow", "❄️"],
+        77: ["Snow grains", "🌨️"], 80: ["Rain showers", "🌦️"], 81: ["Rain showers", "🌧️"], 82: ["Heavy showers", "🌧️"],
+        85: ["Snow showers", "🌨️"], 86: ["Heavy snow showers", "❄️"], 95: ["Thunderstorm", "⛈️"], 96: ["Thunderstorm", "⛈️"], 99: ["Thunderstorm", "⛈️"]
+      };
+      const rainCodes = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]);
+      const grid = document.getElementById("city-grid");
+      const search = document.getElementById("city-search");
       const status = document.getElementById("status");
-      const stage = document.getElementById("crystal-stage");
+      const mapMarkers = document.getElementById("map-markers");
+      const mapSelection = document.getElementById("map-selection");
+      const worldMap = document.getElementById("world-map");
+      const mapCityCount = document.getElementById("map-city-count");
+      let forecasts = [];
+      let unit = "C";
+      let selectedMapCity = "";
+      let mapZoom = 1;
 
-      let game = { dust: 0, level: 0, cost: 15 };
-      try {
-        const saved = JSON.parse(localStorage.getItem(saveKey));
-        if (saved && Number.isFinite(saved.dust) && Number.isFinite(saved.level) && Number.isFinite(saved.cost)) {
-          game = { dust: Math.max(0, Math.floor(saved.dust)), level: Math.max(0, Math.floor(saved.level)), cost: Math.max(15, Math.floor(saved.cost)) };
+      function toUnit(value) {
+        return unit === "F" ? Math.round(value * 9 / 5 + 32) : Math.round(value);
+      }
+
+      function conditionFor(code) {
+        return conditions[code] || ["Cloudy", "☁️"];
+      }
+
+      function mapY(latitude) {
+        const radians = Math.max(-85.0511, Math.min(85.0511, latitude)) * Math.PI / 180;
+        return 250 - Math.log(Math.tan(Math.PI / 4 + radians / 2)) * 500 / (2 * Math.PI);
+      }
+
+      function setMapZoom(zoom) {
+        mapZoom = Math.max(1, Math.min(6, zoom));
+        const width = 1000 / mapZoom;
+        const height = 500 / mapZoom;
+        const selected = forecasts.find(({ city }) => city.name === selectedMapCity);
+        const centerX = selected ? (selected.city.longitude + 180) / 360 * 1000 : 500;
+        const centerY = selected ? mapY(selected.city.latitude) : 250;
+        const left = Math.max(0, Math.min(1000 - width, centerX - width / 2));
+        const top = Math.max(0, Math.min(500 - height, centerY - height / 2));
+        worldMap.setAttribute("viewBox", `${left} ${top} ${width} ${height}`);
+      }
+
+      function renderMap() {
+        const query = search.value.trim().toLocaleLowerCase();
+        const visible = forecasts.filter(({ city }) => `${city.name} ${city.country} ${city.region}`.toLocaleLowerCase().includes(query));
+        mapCityCount.textContent = `${visible.length} of ${forecasts.length} city temperatures · zoom in to explore`;
+        mapMarkers.innerHTML = visible.map(({ city, weather }) => {
+          const x = ((city.longitude + 180) / 360 * 1000).toFixed(1);
+          const y = mapY(city.latitude).toFixed(1);
+          const temperature = toUnit(weather.current.temperature_2m);
+          const condition = conditionFor(weather.current.weather_code)[0];
+          const selected = city.name === selectedMapCity;
+          const labelWidth = unit === "F" ? 38 : 32;
+          return `<g class="map-marker" data-city="${city.name}" role="button" tabindex="0" aria-pressed="${selected}" aria-label="${city.name}, ${temperature}°${unit}, ${condition}. Select for details.">
+            <title>${city.name}, ${city.country}: ${temperature}°${unit}, ${condition}</title>
+            <circle class="marker-halo" cx="${x}" cy="${y}" r="16"></circle>
+            <circle class="marker-core" cx="${x}" cy="${y}" r="6"></circle>
+            <rect class="marker-temp-bg" x="${(Number(x) - labelWidth / 2).toFixed(1)}" y="${(Number(y) - 29).toFixed(1)}" width="${labelWidth}" height="18" rx="9"></rect>
+            <text class="marker-temp" x="${x}" y="${(Number(y) - 20).toFixed(1)}">${temperature}°</text>
+          </g>`;
+        }).join("");
+        const selected = forecasts.find(({ city }) => city.name === selectedMapCity && visible.some((item) => item.city.name === city.name));
+        if (selected) {
+          const { city, weather } = selected;
+          mapSelection.innerHTML = `<strong>${city.name}</strong> · ${conditionFor(weather.current.weather_code)[0]} · ${toUnit(weather.current.temperature_2m)}°${unit} · feels ${toUnit(weather.current.apparent_temperature)}°`;
+        } else {
+          selectedMapCity = "";
+          mapSelection.textContent = visible.length ? "Select a city marker to see current conditions." : "No cities match your search.";
         }
-      } catch { /* Storage may be disabled; the game still works for this visit. */ }
-
-      function save() {
-        try { localStorage.setItem(saveKey, JSON.stringify(game)); } catch { /* Keep playing if storage is unavailable. */ }
       }
 
       function render() {
-        scoreElement.textContent = game.dust.toLocaleString();
-        levelElement.textContent = `LEVEL ${game.level}`;
-        upgradePrice.textContent = `${game.cost.toLocaleString()} ✦`;
-        upgradeButton.disabled = game.dust < game.cost;
-        upgradeLabel.textContent = game.dust >= game.cost ? "Upgrade your fingertips" : `Gather ${game.cost.toLocaleString()} to upgrade`;
-        progressCopy.textContent = `${Math.min(game.dust, game.cost).toLocaleString()} / ${game.cost.toLocaleString()}`;
-        progressFill.style.width = `${Math.min(100, game.dust / game.cost * 100)}%`;
-        rateLabel.textContent = `${(game.level + 1).toLocaleString()} stardust per tap`;
+        const query = search.value.trim().toLocaleLowerCase();
+        const visible = forecasts.filter(({ city }) => featuredCityNames.has(city.name) && `${city.name} ${city.country} ${city.region}`.toLocaleLowerCase().includes(query));
+        if (!visible.length) {
+          grid.innerHTML = '<div class="empty-state">No featured forecast cards match that search. The matching city temperature is shown on the map.</div>';
+          grid.setAttribute("aria-busy", "false");
+          renderMap();
+          return;
+        }
+        grid.innerHTML = visible.map(({ city, weather }, index) => {
+          const currentCondition = conditionFor(weather.current.weather_code);
+          const days = weather.daily.time.slice(1, 5).map((date, dayIndex) => {
+            const code = weather.daily.weather_code[dayIndex + 1];
+            const day = new Intl.DateTimeFormat("en", { weekday: "short", timeZone: weather.timezone || "UTC" }).format(new Date(`${date}T12:00:00Z`));
+            return `<div class="day-row"><span class="day-name">${day}</span><span class="day-icon" aria-label="${conditionFor(code)[0]}">${conditionFor(code)[1]}</span><span class="day-temps"><strong>${toUnit(weather.daily.temperature_2m_max[dayIndex + 1])}°</strong>${toUnit(weather.daily.temperature_2m_min[dayIndex + 1])}°</span></div>`;
+          }).join("");
+          return `<article class="city-card" style="animation-delay:${Math.min(index, 7) * 35}ms">
+            <div class="city-head"><div><h3 class="city-name">${city.name}</h3><p class="city-country">${city.country} · ${city.region}</p></div></div>
+            <div class="current-row"><span class="condition-icon" role="img" aria-label="${currentCondition[0]}">${currentCondition[1]}</span><p class="current-temp">${toUnit(weather.current.temperature_2m)}°</p></div>
+            <p class="condition">${currentCondition[0]}</p>
+            <p class="city-meta"><span>Feels ${toUnit(weather.current.apparent_temperature)}°</span><span>💧 ${weather.current.relative_humidity_2m}%</span><span>↗ ${Math.round(weather.current.wind_speed_10m)} km/h</span></p>
+            <div class="day-list" aria-label="Four-day forecast for ${city.name}">${days}</div>
+          </article>`;
+        }).join("");
+        grid.setAttribute("aria-busy", "false");
+        renderMap();
       }
 
-      document.getElementById("mine-button").addEventListener("click", (event) => {
-        const amount = game.level + 1;
-        game.dust += amount;
-        save();
-        render();
-        status.textContent = `Collected ${amount} stardust.`;
-        const bounds = stage.getBoundingClientRect();
-        const sparkle = document.createElement("span");
-        sparkle.className = "float-number";
-        sparkle.textContent = `+${amount}`;
-        sparkle.style.left = `${bounds.width * (.38 + Math.random() * .24)}px`;
-        sparkle.style.top = `${bounds.height * (.3 + Math.random() * .18)}px`;
-        stage.append(sparkle);
-        sparkle.addEventListener("animationend", () => sparkle.remove(), { once: true });
-      });
+      function renderOverview() {
+        const highs = forecasts.map(({ weather }) => weather.daily.temperature_2m_max[0]);
+        const lows = forecasts.map(({ weather }) => weather.daily.temperature_2m_min[0]);
+        const rain = forecasts.filter(({ weather }) => rainCodes.has(weather.daily.weather_code[0])).length;
+        const warmest = forecasts.reduce((best, item) => item.weather.current.temperature_2m > best.weather.current.temperature_2m ? item : best);
+        document.getElementById("global-range").textContent = `${toUnit(Math.min(...lows))}°–${toUnit(Math.max(...highs))}°`;
+        document.getElementById("rain-count").textContent = `${rain} of ${forecasts.length}`;
+        document.getElementById("overview-title").textContent = `${conditionFor(warmest.weather.current.weather_code)[0]} skies in ${warmest.city.name}.`;
+        document.getElementById("overview-description").textContent = `Among the cities we follow, ${warmest.city.name} is currently the warmest at ${toUnit(warmest.weather.current.temperature_2m)}°. Check the cards for your five-day outlook.`;
+      }
 
-      upgradeButton.addEventListener("click", () => {
-        if (game.dust < game.cost) return;
-        game.dust -= game.cost;
-        game.level += 1;
-        game.cost = Math.ceil(game.cost * 1.65);
-        save();
-        render();
-        status.textContent = `Upgrade purchased. You now collect ${game.level + 1} stardust per tap.`;
-      });
+      async function loadForecast() {
+        grid.setAttribute("aria-busy", "true");
+        grid.innerHTML = '<div class="loading"><div class="loading-inner"><span class="spinner" aria-hidden="true"></span><span>Gathering forecasts from around the world…</span></div></div>';
+        document.getElementById("updated-label").textContent = "Connecting to live forecasts";
+        try {
+          const params = new URLSearchParams({
+            latitude: mapCities.map((city) => city.latitude).join(","),
+            longitude: mapCities.map((city) => city.longitude).join(","),
+            current: "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m",
+            daily: "weather_code,temperature_2m_max,temperature_2m_min",
+            forecast_days: "5",
+            timezone: "auto"
+          });
+          const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+          if (!response.ok) throw new Error(`Forecast service returned ${response.status}.`);
+          const data = await response.json();
+          if (!Array.isArray(data) || data.length !== mapCities.length || data.some((item) => !item.current || !item.daily)) {
+            throw new Error("The forecast service returned incomplete weather data.");
+          }
+          forecasts = mapCities.map((city, index) => ({ city, weather: data[index] }));
+          renderOverview();
+          render();
+          document.getElementById("updated-label").textContent = `Live forecast · ${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date())}`;
+          status.textContent = "Worldwide forecasts updated.";
+        } catch (error) {
+          console.error("Unable to load worldwide weather forecasts:", error);
+          forecasts = [];
+          grid.innerHTML = '<div class="empty-state error-state"><div><strong>We couldn’t load the forecast just now.</strong><br>Check your connection and try again.<br><button class="retry" id="retry-button" type="button">Try again</button></div></div>';
+          grid.setAttribute("aria-busy", "false");
+          document.getElementById("updated-label").textContent = "Forecast unavailable";
+          document.getElementById("retry-button").addEventListener("click", loadForecast);
+          status.textContent = "Weather data could not be loaded. Try again.";
+        }
+      }
 
-      document.getElementById("reset-button").addEventListener("click", () => {
-        if (!window.confirm("Reset your stardust and upgrades?")) return;
-        game = { dust: 0, level: 0, cost: 15 };
-        save();
-        render();
-        status.textContent = "Game reset.";
+      mapMarkers.addEventListener("click", (event) => {
+        const marker = event.target.closest(".map-marker");
+        if (!marker) return;
+        selectedMapCity = marker.dataset.city;
+        renderMap();
       });
-
-      render();
+      mapMarkers.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const marker = event.target.closest(".map-marker");
+        if (!marker) return;
+        event.preventDefault();
+        selectedMapCity = marker.dataset.city;
+        renderMap();
+        mapMarkers.querySelector(`[data-city="${selectedMapCity}"]`).focus();
+      });
+      document.getElementById("map-zoom-in").addEventListener("click", () => setMapZoom(mapZoom * 1.5));
+      document.getElementById("map-zoom-out").addEventListener("click", () => setMapZoom(mapZoom / 1.5));
+      document.getElementById("map-zoom-reset").addEventListener("click", () => setMapZoom(1));
+      search.addEventListener("input", render);
+      document.querySelectorAll(".unit-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          unit = button.dataset.unit;
+          document.querySelectorAll(".unit-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          if (forecasts.length) {
+            renderOverview();
+            render();
+          }
+        });
+      });
+      loadForecast();
     })();
   </script>
 </body>
